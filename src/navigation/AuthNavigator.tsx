@@ -5,7 +5,8 @@ import LoginScreen from "../screens/auth/LoginScreen";
 import RegisterScreen from "../screens/auth/RegisterScreen";
 import ParentRegistrationScreen from "../screens/auth/ParentRegistrationScreen";
 import TeacherRegistrationScreen from "../screens/auth/TeacherRegistrationScreen";
-
+import AdminLoginScreen from "../screens/auth/AdminLoginScreen";
+import PendingRegistrationsScreen from "../screens/admin/PendingRegistrationsScreen";
 const Stack = createNativeStackNavigator();
 
 export default function AuthNavigator() {
@@ -39,6 +40,15 @@ export default function AuthNavigator() {
   name="TeacherRegistration"
   component={TeacherRegistrationScreen}
   options={{ title: "Teacher Registration" }}
+/>
+<Stack.Screen
+  name="AdminLogin"
+  component={AdminLoginScreen}
+/>
+
+<Stack.Screen
+  name="PendingRegistrations"
+  component={PendingRegistrationsScreen}
 />
     </Stack.Navigator>
   );

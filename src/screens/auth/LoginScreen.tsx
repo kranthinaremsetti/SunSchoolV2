@@ -81,6 +81,20 @@ export default function LoginScreen() {
               New User? Register
             </Text>
           </TouchableOpacity>
+          <TouchableOpacity
+  onPress={() => navigation.navigate("AdminLogin")}
+>
+  <Text
+    style={{
+      textAlign: "center",
+      marginTop: 15,
+      color: "#1565C0",
+      fontWeight: "bold",
+    }}
+  >
+    Admin Login
+  </Text>
+</TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
