@@ -10,17 +10,61 @@ import {
   Platform,
   Image,
 } from "react-native";
+import { Alert } from "react-native";
+import { loginUser } from "../../services/authService";
 import { useNavigation } from "@react-navigation/native";
 const schoolLogo = require("../../assets/images/school_logo_cropped.png");
 export default function LoginScreen() {
   const navigation = useNavigation<any>();
 
-  const [mobile, setMobile] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+const handleLogin = async () => {
+  try {
+    const user = await loginUser(email, password);
 
-  const handleLogin = () => {
-    alert("Firebase Login will be added next.");
-  };
+    if (!user) {
+      Alert.alert("Login Failed", "User not found.");
+      return;
+    }
+
+    if (user.status === "pending") {
+      Alert.alert(
+        "Pending Approval",
+        "Your account is waiting for admin approval."
+      );
+      return;
+    }
+
+    if (user.status === "rejected") {
+      Alert.alert(
+        "Rejected",
+        "Your registration was rejected. Please contact the school."
+      );
+      return;
+    }
+
+    switch (user.role) {
+      case "admin":
+        navigation.replace("AdminDashboard");
+        break;
+
+      case "teacher":
+        navigation.replace("TeacherDashboard");
+        break;
+
+      case "parent":
+        navigation.replace("ParentDashboard");
+        break;
+
+      default:
+        Alert.alert("Error", "Unknown user role.");
+    }
+
+  } catch (error: any) {
+    Alert.alert("Login Failed", error.message);
+  }
+};
 
   return (
     <SafeAreaView style={styles.container}>
@@ -43,12 +87,11 @@ export default function LoginScreen() {
           <Text style={styles.heading}>Welcome Back 👋</Text>
 
           <TextInput
-            placeholder="Mobile Number"
-            keyboardType="phone-pad"
-            value={mobile}
-            onChangeText={setMobile}
+            placeholder="Email"
+            keyboardType="email-address"
+            value={email}
+            onChangeText={setEmail}
             style={styles.input}
-            maxLength={10}
           />
 
           <TextInput
@@ -81,20 +124,6 @@ export default function LoginScreen() {
               New User? Register
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity
-  onPress={() => navigation.navigate("AdminLogin")}
->
-  <Text
-    style={{
-      textAlign: "center",
-      marginTop: 15,
-      color: "#1565C0",
-      fontWeight: "bold",
-    }}
-  >
-    Admin Login
-  </Text>
-</TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
