@@ -32,15 +32,32 @@ export default function PendingRegistrationsScreen() {
   }, []);
 
   const handleApprove = async (uid: string) => {
-    await approveUser(uid);
-    Alert.alert("Approved");
-    loadUsers();
-  };
+  try {
+    console.log("Approving:", uid);
 
-  const handleReject = async (uid: string) => {
-    await rejectUser(uid);
-    Alert.alert("Rejected");
+    await approveUser(uid);
+
+    Alert.alert("Approved");
+
     loadUsers();
+  } catch (error: any) {
+    console.log("Approve Error:", error);
+    Alert.alert("Error", error.message);
+  }
+};
+  const handleReject = async (uid: string) => {
+    try {
+      console.log("Rejecting:", uid);
+
+      await rejectUser(uid);
+
+      Alert.alert("Rejected");
+
+      loadUsers();
+    } catch (error: any) {
+      console.log("Reject Error:", error);
+      Alert.alert("Error", error.message);
+    }
   };
 
   const renderItem = ({ item }: any) => (

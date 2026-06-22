@@ -12,7 +12,7 @@ import DashboardCard from "../../components/DashboardCard";
 import { useNavigation } from "@react-navigation/native";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../firebase/firebaseConfig";
-
+import { TouchableOpacity } from "react-native";
 export default function AdminDashboard() {
   const navigation = useNavigation<any>();
   const logout = async () => {
@@ -56,11 +56,23 @@ export default function AdminDashboard() {
       console.log(e);
     }
   }
-
+const handleLogout = async () => {
+  await signOut(auth);
+  navigation.reset({
+    index: 0,
+    routes: [{ name: "Login" }],
+  });
+};
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
+        <View style={styles.header}>
+  <Text style={styles.title}>Parent Dashboard</Text>
 
+  <TouchableOpacity onPress={handleLogout}>
+    <Text style={styles.logout}>Logout</Text>
+  </TouchableOpacity>
+</View>
         <View style={styles.header}>
           <Text style={styles.school}>
             Sun School
@@ -124,10 +136,6 @@ export default function AdminDashboard() {
           <DashboardCard
             title="Holidays"
           />
-          <DashboardCard
-title="Logout"
-onPress={logout}
-/>
         </View>
 
       </ScrollView>
@@ -146,6 +154,10 @@ const styles = StyleSheet.create({
     padding: 25,
     borderBottomLeftRadius: 25,
     borderBottomRightRadius: 25,
+      flexDirection: "row",
+  justifyContent: "space-between",
+  alignItems: "center",
+  marginBottom: 20,
   },
 
   school: {
@@ -166,4 +178,15 @@ const styles = StyleSheet.create({
     justifyContent: "space-evenly",
     padding: 15,
   },
+
+title: {
+  fontSize: 28,
+  fontWeight: "bold",
+},
+
+logout: {
+  color: "#1565C0",
+  fontWeight: "bold",
+  fontSize: 16,
+},
 });
