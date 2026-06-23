@@ -51,16 +51,16 @@ export async function approveUser(uid: string) {
     const parent: any = parentDoc.data();
 
     const studentRef = await addDoc(
-      collection(db, "students"),
-      {
-        name: parent.studentName,
-        rollNo: parent.rollNo,
-        className: parent.class,
-        section: parent.section,
-        dob: parent.dob,
-        parentId: uid,
-      }
-    );
+  collection(db, "students"),
+  {
+    name: parent.studentName,
+    rollNo: parent.rollNo,
+    className: parent.className,
+    section: parent.section,
+    dob: parent.dob,
+    parentId: uid,
+  }
+);
 
     await updateDoc(
       doc(db, "users", uid),
