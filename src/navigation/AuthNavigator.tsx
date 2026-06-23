@@ -20,6 +20,12 @@ import ProfileScreen from "../screens/parent/ProfileScreen";
 import LeaveRequestScreen from "../screens/parent/LeaveRequestScreen";
 import LeaveHistoryScreen from "../screens/parent/LeaveHistoryScreen";
 import HolidayScreen from "../screens/parent/HolidayScreen";
+import TeacherManagementScreen from "../screens/admin/TeacherManagementScreen";
+import LeaveRequestsScreen from "../screens/admin/LeaveRequestsScreen";
+import AdminAnnouncementsScreen from "../screens/admin/AdminAnnouncementsScreen";
+import FeeManagementScreen from "../screens/admin/FeeManagementScreen";
+import HolidayManagementScreen from "../screens/admin/HolidayManagementScreen";
+
 const Stack = createNativeStackNavigator();
 
 export default function AuthNavigator() {
@@ -86,6 +92,26 @@ component={AdminDashboard}
 <Stack.Screen
   name="StudentManagement"
   component={StudentManagementScreen}
+/>
+<Stack.Screen
+  name="TeacherManagement"
+  component={TeacherManagementScreen}
+/>
+<Stack.Screen
+  name="LeaveRequests"
+  component={LeaveRequestsScreen}
+/>
+<Stack.Screen
+  name="AdminAnnouncements"
+  component={AdminAnnouncementsScreen}
+/>
+<Stack.Screen
+    name="FeeManagement"
+    component={FeeManagementScreen}
+/>
+<Stack.Screen
+    name="HolidayManagement"
+    component={HolidayManagementScreen}
 />
     </Stack.Navigator>
   );

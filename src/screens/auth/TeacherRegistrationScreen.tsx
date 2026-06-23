@@ -9,7 +9,7 @@ import {
 
 import AppInput from "../../components/AppInput";
 import AppButton from "../../components/AppButton";
-
+import { registerTeacher } from "../../services/authService";
 export default function TeacherRegistrationScreen() {
   const [teacherName, setTeacherName] = useState("");
   const [mobile, setMobile] = useState("");
@@ -20,29 +20,38 @@ export default function TeacherRegistrationScreen() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const handleRegister = () => {
-    if (
-      !teacherName ||
-      !mobile ||
-      !email ||
-      !qualification ||
-      !subject ||
-      !password ||
-      !confirmPassword
-    ) {
-      Alert.alert("Error", "Please fill all required fields");
-      return;
-    }
+  const handleRegister = async() => {
+    try {
+  await registerTeacher({
+    teacherName,
+    mobile,
+    email,
+    qualification,
+    subject,
+    experience,
+    password,
+  });
 
-    if (password !== confirmPassword) {
-      Alert.alert("Error", "Passwords do not match");
-      return;
-    }
+  Alert.alert(
+    "Success",
+    "Registration Submitted.\nWait for Admin Approval."
+  );
 
-    Alert.alert(
-      "Success",
-      "Teacher Registration UI Completed.\nFirebase will be connected next."
-    );
+  setTeacherName("");
+  setMobile("");
+  setEmail("");
+  setQualification("");
+  setSubject("");
+  setExperience("");
+  setPassword("");
+  setConfirmPassword("");
+
+} catch (error: any) {
+  Alert.alert(
+    "Registration Failed",
+    error.message
+  );
+}
   };
 
   return (

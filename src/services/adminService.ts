@@ -26,35 +26,73 @@ export async function getPendingUsers() {
 export async function approveUser(uid: string) {
   console.log("UID:", uid);
 
-  const parentDoc = await getDoc(doc(db, "parents", uid));
+  const userDoc = await getDoc(doc(db, "users", uid));
 
-  console.log("Parent Exists:", parentDoc.exists());
-
-  if (!parentDoc.exists()) {
-    throw new Error("Parent document not found");
+  if (!userDoc.exists()) {
+    throw new Error("User not found");
   }
 
-  const parent: any = parentDoc.data();
+  const user: any = userDoc.data();
 
-  console.log(parent);
+  // -------------------------
+  // Parent Approval
+  // -------------------------
+  if (user.role === "parent") {
+    const parentDoc = await getDoc(
+      doc(db, "parents", uid)
+    );
 
-  const studentRef = await addDoc(collection(db, "students"), {
-    name: parent.studentName,
-    rollNo: parent.rollNo,
-    className: parent.class,
-    section: parent.section,
-    dob: parent.dob,
-    parentId: uid,
-  });
+    if (!parentDoc.exists()) {
+      throw new Error(
+        "Parent document not found"
+      );
+    }
 
-  await updateDoc(doc(db, "users", uid), {
-    status: "approved",
-    studentId: studentRef.id,
-  });
+    const parent: any = parentDoc.data();
 
-  await updateDoc(doc(db, "parents", uid), {
-    linkedStudent: true,
-  });
+    const studentRef = await addDoc(
+      collection(db, "students"),
+      {
+        name: parent.studentName,
+        rollNo: parent.rollNo,
+        className: parent.class,
+        section: parent.section,
+        dob: parent.dob,
+        parentId: uid,
+      }
+    );
+
+    await updateDoc(
+      doc(db, "users", uid),
+      {
+        status: "approved",
+        studentId: studentRef.id,
+      }
+    );
+
+    await updateDoc(
+      doc(db, "parents", uid),
+      {
+        linkedStudent: true,
+      }
+    );
+
+    return;
+  }
+
+  // -------------------------
+  // Teacher Approval
+  // -------------------------
+  if (user.role === "teacher") {
+    await updateDoc(
+      doc(db, "users", uid),
+      {
+        status: "approved",
+      }
+    );
+
+    return;
+  }
 }
 
 export async function rejectUser(uid: string) {

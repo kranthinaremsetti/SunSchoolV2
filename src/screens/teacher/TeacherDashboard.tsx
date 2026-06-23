@@ -6,7 +6,9 @@ import {
   ScrollView,
 } from "react-native";
 import { signOut } from "firebase/auth";
-import { auth } from "../../firebase/firebaseConfig";
+import { auth, db } from "../../firebase/firebaseConfig";
+import { useNavigation } from "@react-navigation/native";
+
 export default function TeacherDashboard() {
   const navigation = useNavigation<any>();
 const handleLogout = async () => {
@@ -16,6 +18,13 @@ const handleLogout = async () => {
     routes: [{ name: "Login" }],
   });
 };
+const uid = auth.currentUser?.uid;
+
+const teacherDoc = await getDoc(
+  doc(db, "teachers", uid!)
+);
+
+const teacher = teacherDoc.data();
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
@@ -27,15 +36,15 @@ const handleLogout = async () => {
 </View>
           <View style={styles.teacherCard}>
       <Text style={styles.teacherName}>
-        👨‍🏫 Teacher
+        {teacher?.teacherName}
       </Text>
 
       <Text style={styles.teacherInfo}>
-        Class: 5th Class
+        Qualification: {teacher?.qualification}
       </Text>
 
       <Text style={styles.teacherInfo}>
-        Subject: Mathematics
+        Subject: {teacher?.subject}
       </Text>
 </View>
     <View style={styles.row}>

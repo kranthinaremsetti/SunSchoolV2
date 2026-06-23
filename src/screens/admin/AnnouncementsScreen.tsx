@@ -12,7 +12,7 @@ import {
 
 import {
   getAnnouncements,
-} from "../services/announcementService";
+} from "../../services/announcementService";
 
 export default function AnnouncementsScreen() {
   const [

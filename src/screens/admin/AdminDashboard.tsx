@@ -67,7 +67,7 @@ const handleLogout = async () => {
     <SafeAreaView style={styles.container}>
       <ScrollView>
         <View style={styles.header}>
-  <Text style={styles.title}>Parent Dashboard</Text>
+  <Text style={styles.title}>Admin Dashboard</Text>
 
   <TouchableOpacity onPress={handleLogout}>
     <Text style={styles.logout}>Logout</Text>
@@ -121,21 +121,33 @@ const handleLogout = async () => {
             title="Results"
           />
 
-          <DashboardCard
-            title="Fees"
-          />
+         <DashboardCard
+    title="Fees"
+    onPress={() =>
+        navigation.navigate("FeeManagement")
+    }
+/>
 
           <DashboardCard
-            title="Announcements"
-          />
+  title="Announcements"
+  onPress={() =>
+    navigation.navigate("AdminAnnouncements")
+  }
+/>
 
           <DashboardCard
-            title="Leave Requests"
-          />
+  title="Leave Requests"
+  onPress={() =>
+    navigation.navigate("LeaveRequests")
+  }
+/>
 
           <DashboardCard
-            title="Holidays"
-          />
+    title="Holidays"
+    onPress={() =>
+        navigation.navigate("HolidayManagement")
+    }
+/>
         </View>
 
       </ScrollView>

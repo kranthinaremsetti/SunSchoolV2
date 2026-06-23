@@ -7,42 +7,59 @@ import {
   Alert,
 } from "react-native";
 import { useState, useEffect } from "react";
-import { getStudents } from "../../services/studentService";
 import { Picker } from "@react-native-picker/picker";
-import { classesData } from "../../constants/classesData";
+
+import { getStudents } from "../../services/studentService";
 import { saveNotification } from "../../services/notificationService";
-import {
-  saveAttendance,
-} from "../../services/attendanceService";
+import { saveAttendance } from "../../services/attendanceService";
 import { auth } from "../../firebase/firebaseConfig";
+import { classesData } from "../../constants/classesData";
+
+interface StudentAttendance {
+  id: string;
+  name: string;
+  className: string;
+  present: boolean;
+}
 
 export default function TeacherAttendanceScreen() {
-  const [studentsState, setStudentsState] =
-  useState<any[]>([]);
- useEffect(() => {
-  loadStudents();
-}, [selectedClass]);
-const loadStudents = async () => {
-  const data = await getStudents();
-
-  setStudentsState(
-    data
-      .filter(
-        (student) =>
-          student.className === selectedClass
-      )
-      .map((student) => ({
-        ...student,
-        present: true,
-      }))
-  );
-};
   const [selectedClass, setSelectedClass] =
     useState("5th Class");
 
-  const toggleAttendance = (id: number) => {
-    setStudentsState(
-      studentsState.map((student) =>
+  const [studentsState, setStudentsState] =
+    useState<StudentAttendance[]>([]);
+
+  useEffect(() => {
+    loadStudents();
+  }, [selectedClass]);
+
+  const loadStudents = async () => {
+    try {
+      const data = await getStudents();
+
+      const filteredStudents: StudentAttendance[] =
+        data
+          .filter(
+            (student: any) =>
+              student.className === selectedClass
+          )
+          .map((student: any) => ({
+            id: student.id,
+            name: student.name,
+            className: student.className,
+            present: true,
+          }));
+
+      setStudentsState(filteredStudents);
+
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const toggleAttendance = (id: string) => {
+    setStudentsState((prev) =>
+      prev.map((student) =>
         student.id === id
           ? {
               ...student,
@@ -52,41 +69,47 @@ const loadStudents = async () => {
       )
     );
   };
-const submitAttendance = async () => {
-  try {
-    const today = new Date().toISOString().split("T")[0];
 
-    for (const student of studentsState) {
+  const submitAttendance = async () => {
+    try {
+      const today = new Date()
+        .toISOString()
+        .split("T")[0];
 
-      await saveAttendance(
-        student.id,
-        today,
-        student.present ? "Present" : "Absent",
-        auth.currentUser?.uid || ""
+      for (const student of studentsState) {
+        await saveAttendance(
+          student.id,
+          today,
+          student.present
+            ? "Present"
+            : "Absent",
+          auth.currentUser?.uid || ""
+        );
+
+        if (!student.present) {
+          await saveNotification(
+            student.id,
+            "Attendance Alert",
+            `You were absent on ${today}`
+          );
+        }
+      }
+
+      Alert.alert(
+        "Success",
+        "Attendance submitted successfully."
       );
 
-      if (!student.present) {
-        await saveNotification(
-          student.id,
-          "Attendance Alert",
-          `You were absent on ${today}`
-        );
-      }
+    } catch (error) {
+      console.log(error);
+
+      Alert.alert(
+        "Error",
+        "Failed to submit attendance."
+      );
     }
+  };
 
-    Alert.alert(
-      "Success",
-      "Attendance submitted successfully."
-    );
-
-  } catch (error) {
-    console.log(error);
-    Alert.alert(
-      "Error",
-      "Failed to submit attendance."
-    );
-  }
-};
   return (
     <View style={styles.container}>
       <Text style={styles.title}>
@@ -100,8 +123,8 @@ const submitAttendance = async () => {
 
         <Picker
           selectedValue={selectedClass}
-          onValueChange={(itemValue) =>
-            setSelectedClass(itemValue)
+          onValueChange={(value) =>
+            setSelectedClass(value)
           }
         >
           {classesData.map((className) => (
@@ -125,9 +148,10 @@ const submitAttendance = async () => {
             style={[
               styles.studentItem,
               {
-                backgroundColor: student.present
-                  ? "#DCFCE7"
-                  : "#FEE2E2",
+                backgroundColor:
+                  student.present
+                    ? "#DCFCE7"
+                    : "#FEE2E2",
               },
             ]}
             onPress={() =>
