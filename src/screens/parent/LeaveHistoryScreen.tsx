@@ -35,9 +35,10 @@ export default function LeaveHistoryScreen() {
       const allLeaves = await getLeaveRequests();
 
       const filtered = allLeaves.filter(
-        (leave) =>
-          leave.studentId === user.studentId
-      );
+  (leave) =>
+    leave.userId === uid &&
+    leave.role === "parent"
+);
 
       setLeaveHistory(filtered);
 
@@ -59,32 +60,36 @@ export default function LeaveHistoryScreen() {
       ) : (
         leaveHistory.map((leave) => (
           <View
-            key={leave.firestoreId}
-            style={styles.card}
-          >
-            <Text style={styles.reason}>
-              {leave.reason}
-            </Text>
+  key={leave.firestoreId}
+  style={styles.card}
+>
+  <Text style={styles.reason}>
+    {leave.leaveType}
+  </Text>
 
-            <Text>
-              {leave.fromDate} → {leave.toDate}
-            </Text>
+  <Text style={{ marginTop: 6 }}>
+    {leave.description}
+  </Text>
 
-            <Text
-              style={{
-                color:
-                  leave.status === "Approved"
-                    ? "green"
-                    : leave.status === "Rejected"
-                    ? "red"
-                    : "#F59E0B",
-                fontWeight: "bold",
-                marginTop: 8,
-              }}
-            >
-              {leave.status}
-            </Text>
-          </View>
+  <Text style={{ marginTop: 8 }}>
+    {leave.fromDate} → {leave.toDate}
+  </Text>
+
+  <Text
+    style={{
+      color:
+        leave.status === "Approved"
+          ? "green"
+          : leave.status === "Rejected"
+          ? "red"
+          : "#F59E0B",
+      fontWeight: "bold",
+      marginTop: 8,
+    }}
+  >
+    {leave.status}
+  </Text>
+</View>
         ))
       )}
     </ScrollView>

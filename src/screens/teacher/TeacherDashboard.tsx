@@ -84,58 +84,59 @@ const handleLogout = async () => {
       </View>
 
       <View style={styles.row}>
-        <TouchableOpacity
-          style={styles.card}
-          onPress={() =>
-            navigation.navigate(
-              "TeacherAnnouncement"
-            )
-          }
-        >
-          <Text style={styles.cardText}>
-            📢 Announcements
-          </Text>
-        </TouchableOpacity>
+  <TouchableOpacity
+    style={styles.card}
+    onPress={() =>
+      navigation.navigate(
+        "TeacherStudents"
+      )
+    }
+  >
+    <Text style={styles.cardText}>
+      👥 Students
+    </Text>
+  </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.card}
-          onPress={() =>
-            navigation.navigate(
-              "TeacherStudents"
-            )
-          }
-        >
-          <Text style={styles.cardText}>
-            👥 Students
-          </Text>
-        </TouchableOpacity>
+  <TouchableOpacity
+    style={styles.card}
+    onPress={() =>
+      navigation.navigate(
+        "TeacherResults"
+      )
+    }
+  >
+    <Text style={styles.cardText}>
+      📊 Results
+    </Text>
+  </TouchableOpacity>
       </View>
       <View style={styles.row}>
-          <TouchableOpacity
-          style={styles.card}
-          onPress={() =>
-            navigation.navigate(
-              "LeaveRequests"
-            )
-          }
-        >
-          <Text style={styles.cardText}>
-            🕒 Leave Requests
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.card}
-          onPress={() =>
-            navigation.navigate(
-              "TeacherResults"
-            )
-          }
-        >
-          <Text style={styles.cardText}>
-            📊 Results
-          </Text>
-        </TouchableOpacity>
-      </View>
+  <TouchableOpacity
+    style={styles.card}
+    onPress={() =>
+      navigation.navigate(
+        "TeacherLeaveRequest"
+      )
+    }
+  >
+    <Text style={styles.cardText}>
+      📝 Apply Leave
+    </Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity
+    style={styles.card}
+    onPress={() =>
+      navigation.navigate(
+        "TeacherLeaveHistory"
+      )
+    }
+  >
+    <Text style={styles.cardText}>
+      📄 Leave History
+    </Text>
+  </TouchableOpacity>
+</View>
       
     </ScrollView>
   );
@@ -214,10 +215,6 @@ header: {
   marginBottom: 20,
 },
 
-title: {
-  fontSize: 28,
-  fontWeight: "bold",
-},
 
 logout: {
   color: "#1565C0",

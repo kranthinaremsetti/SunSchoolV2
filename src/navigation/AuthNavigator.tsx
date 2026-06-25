@@ -25,7 +25,12 @@ import LeaveRequestsScreen from "../screens/admin/LeaveRequestsScreen";
 import AdminAnnouncementsScreen from "../screens/admin/AdminAnnouncementsScreen";
 import FeeManagementScreen from "../screens/admin/FeeManagementScreen";
 import HolidayManagementScreen from "../screens/admin/HolidayManagementScreen";
-
+import TeacherAttendanceScreen from "../screens/teacher/TeacherAttendanceScreen";
+import TeacherHomeworkScreen from "../screens/teacher/TeacherHomeworkScreen";
+import TeacherLeaveRequestScreen from "../screens/teacher/TeacherLeaveRequestScreen";
+import TeacherLeaveHistoryScreen from "../screens/teacher/TeacherLeaveHistoryScreen";
+import TeacherStudentsScreen from "../screens/teacher/TeacherStudentsScreen";
+import TeacherResultsScreen from "../screens/teacher/TeacherResultsScreen";
 const Stack = createNativeStackNavigator();
 
 export default function AuthNavigator() {
@@ -84,7 +89,34 @@ component={ParentDashboard}
 name="TeacherDashboard"
 component={TeacherDashboard}
 />
+<Stack.Screen
+  name="TeacherAttendance"
+  component={TeacherAttendanceScreen}
+/>
 
+<Stack.Screen
+  name="TeacherHomework"
+  component={TeacherHomeworkScreen}
+/>
+
+<Stack.Screen
+  name="TeacherStudents"
+  component={TeacherStudentsScreen}
+/>
+
+<Stack.Screen
+  name="TeacherResults"
+  component={TeacherResultsScreen}
+/>
+<Stack.Screen
+  name="TeacherLeaveRequest"
+  component={TeacherLeaveRequestScreen}
+/>
+
+<Stack.Screen
+  name="TeacherLeaveHistory"
+  component={TeacherLeaveHistoryScreen}
+/>
 <Stack.Screen
 name="AdminDashboard"
 component={AdminDashboard}

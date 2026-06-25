@@ -11,11 +11,20 @@ import {
 import { auth, db } from "../../firebase/firebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
 import { saveLeaveRequest } from "../../services/leaveService";
+import { Picker } from "@react-native-picker/picker";
 
 export default function LeaveRequestScreen() {
-  const [reason, setReason] = useState("");
+  const [leaveType, setLeaveType] = useState("");
+  const [description, setDescription] = useState("");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
+
+  const pickDocument = () => {
+    Alert.alert(
+      "Coming Soon",
+      "Document upload will be available in a future update."
+    );
+  };
 
   const submitLeave = async () => {
     try {
@@ -30,29 +39,30 @@ export default function LeaveRequestScreen() {
         return;
       }
 
-      const user: any = userSnap.data();
-
       await saveLeaveRequest(
-        user.studentId,
-        reason,
+        uid,
+        "parent",
+        leaveType,
+        description,
         fromDate,
-        toDate
+        toDate,
+        ""
       );
 
       Alert.alert(
         "Success",
-        "Leave request submitted."
+        "Leave request submitted successfully."
       );
 
-      setReason("");
+      setLeaveType("");
+      setDescription("");
       setFromDate("");
       setToDate("");
-
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
       Alert.alert(
         "Error",
-        "Failed to submit leave request."
+        error.message || "Failed to submit leave request."
       );
     }
   };
@@ -63,11 +73,49 @@ export default function LeaveRequestScreen() {
         Leave Request
       </Text>
 
+      <View style={styles.pickerContainer}>
+        <Picker
+          selectedValue={leaveType}
+          onValueChange={setLeaveType}
+        >
+          <Picker.Item
+            label="Select Leave Type"
+            value=""
+          />
+          <Picker.Item
+            label="Sick Leave"
+            value="Sick Leave"
+          />
+          <Picker.Item
+            label="Medical Leave"
+            value="Medical Leave"
+          />
+          <Picker.Item
+            label="Casual Leave"
+            value="Casual Leave"
+          />
+          <Picker.Item
+            label="Emergency Leave"
+            value="Emergency Leave"
+          />
+          <Picker.Item
+            label="Personal Leave"
+            value="Personal Leave"
+          />
+          <Picker.Item
+            label="Other"
+            value="Other"
+          />
+        </Picker>
+      </View>
+
       <TextInput
-        style={styles.input}
-        placeholder="Reason"
-        value={reason}
-        onChangeText={setReason}
+        style={[styles.input, { height: 100 }]}
+        placeholder="Explain your leave..."
+        value={description}
+        onChangeText={setDescription}
+        multiline
+        textAlignVertical="top"
       />
 
       <TextInput
@@ -85,11 +133,20 @@ export default function LeaveRequestScreen() {
       />
 
       <TouchableOpacity
+        style={styles.uploadButton}
+        onPress={pickDocument}
+      >
+        <Text style={styles.uploadText}>
+          📎 Attach Supporting Document (Coming Soon)
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
         style={styles.button}
         onPress={submitLeave}
       >
         <Text style={styles.buttonText}>
-          Submit
+          Submit Leave Request
         </Text>
       </TouchableOpacity>
     </View>
@@ -109,12 +166,32 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
 
+  pickerContainer: {
+    backgroundColor: "white",
+    borderRadius: 10,
+    marginBottom: 15,
+    elevation: 2,
+  },
+
   input: {
     backgroundColor: "white",
     padding: 15,
     borderRadius: 10,
     marginBottom: 15,
     elevation: 2,
+  },
+
+  uploadButton: {
+    backgroundColor: "#E5E7EB",
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
+    marginBottom: 20,
+  },
+
+  uploadText: {
+    fontWeight: "bold",
+    color: "#555",
   },
 
   button: {
@@ -126,7 +203,7 @@ const styles = StyleSheet.create({
 
   buttonText: {
     color: "white",
-    fontWeight: "bold",
     fontSize: 18,
+    fontWeight: "bold",
   },
 });

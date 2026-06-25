@@ -1,14 +1,11 @@
 import { initializeApp } from "firebase/app";
-import {
-  initializeAuth,
-  getReactNativePersistence,
-} from "firebase/auth";
-
-import AsyncStorage from "@react-native-async-storage/async-storage";import { getFirestore } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: "AIzaSyArdKP4rYApEnxnjjf35e5z5Tzn7Z3zTks",
-  authDomain: "sun-school-v2.firebaseapp.com",
+  
   projectId: "sun-school-v2",
   storageBucket: "sun-school-v2.firebasestorage.app",
   messagingSenderId: "429205969920",
@@ -16,9 +13,9 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-export const auth = initializeAuth(app, {
-  persistence: getReactNativePersistence(AsyncStorage),
-});
+
+export const auth = getAuth(app);
 export const db = getFirestore(app);
+export const storage = getStorage(app);
 
 export default app;

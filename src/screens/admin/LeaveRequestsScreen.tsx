@@ -7,7 +7,7 @@ import {
   StyleSheet,
   Alert,
 } from "react-native";
-
+import { Linking } from "react-native";
 import {
   getLeaveRequests,
   updateLeaveStatus,
@@ -50,55 +50,79 @@ export default function LeaveRequestsScreen() {
       renderItem={({ item }) => (
         <View style={styles.card}>
 
-          <Text style={styles.title}>
-            Student ID: {item.studentId}
-          </Text>
+  <Text style={styles.title}>
+    {item.role === "teacher" ? "👨‍🏫 Teacher" : "👤 Parent"}
+  </Text>
 
-          <Text>
-            Reason: {item.reason}
-          </Text>
+  <Text>
+    Leave Type: {item.leaveType}
+  </Text>
 
-          <Text>
-            From: {item.fromDate}
-          </Text>
+  <Text>
+    Description:
+  </Text>
 
-          <Text>
-            To: {item.toDate}
-          </Text>
+  <Text style={{ marginBottom: 10 }}>
+    {item.description}
+  </Text>
 
-          <Text style={styles.status}>
-            Status: {item.status}
-          </Text>
+  <Text>
+    From: {item.fromDate}
+  </Text>
 
-          {item.status === "Pending" && (
-            <View style={styles.row}>
+  <Text>
+    To: {item.toDate}
+  </Text>
 
-              <TouchableOpacity
-                style={styles.approve}
-                onPress={() =>
-                  approve(item.firestoreId)
-                }
-              >
-                <Text style={styles.btnText}>
-                  Approve
-                </Text>
-              </TouchableOpacity>
+  {item.attachmentUrl ? (
+    <TouchableOpacity
+      onPress={() =>
+        Linking.openURL(item.attachmentUrl)
+      }
+    >
+      <Text
+        style={{
+          color: "#2563EB",
+          marginTop: 10,
+          fontWeight: "bold",
+        }}
+      >
+        📎 View Supporting Document
+      </Text>
+    </TouchableOpacity>
+  ) : null}
 
-              <TouchableOpacity
-                style={styles.reject}
-                onPress={() =>
-                  reject(item.firestoreId)
-                }
-              >
-                <Text style={styles.btnText}>
-                  Reject
-                </Text>
-              </TouchableOpacity>
+  <Text style={styles.status}>
+    Status: {item.status}
+  </Text>
 
-            </View>
-          )}
+  {item.status === "Pending" && (
+    <View style={styles.row}>
+      <TouchableOpacity
+        style={styles.approve}
+        onPress={() =>
+          approve(item.firestoreId)
+        }
+      >
+        <Text style={styles.btnText}>
+          Approve
+        </Text>
+      </TouchableOpacity>
 
-        </View>
+      <TouchableOpacity
+        style={styles.reject}
+        onPress={() =>
+          reject(item.firestoreId)
+        }
+      >
+        <Text style={styles.btnText}>
+          Reject
+        </Text>
+      </TouchableOpacity>
+    </View>
+  )}
+
+</View>
       )}
     />
   );
