@@ -15,10 +15,10 @@ import {
   Homework,
 } from "../../services/homeworkService";
 
+
 export default function HomeworkScreen() {
   const [homework, setHomework] = useState<Homework[]>([]);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     loadHomework();
   }, []);
@@ -54,12 +54,16 @@ export default function HomeworkScreen() {
       // Load homework
       const allHomework = await getHomework();
 
-      setHomework(
-        allHomework.filter(
-          (item) =>
-            item.className === student.className
-        )
-      );
+      const filtered = allHomework
+  .filter(
+    (item) =>
+      item.className === student.className
+  )
+  .sort((a, b) =>
+    a.dueDate.localeCompare(b.dueDate)
+  );
+
+setHomework(filtered);
     } catch (error) {
       console.log("Homework Error:", error);
     } finally {
@@ -100,19 +104,37 @@ export default function HomeworkScreen() {
       ) : (
         homework.map((item) => (
           <View
-            key={item.firestoreId}
-            style={styles.card}
-          >
-            <Text style={styles.subject}>
-              {item.subject}
-            </Text>
+  key={item.firestoreId}
+  style={styles.card}
+>
+  <Text style={styles.subject}>
+    📘 {item.subject}
+  </Text>
 
-            <Text>{item.task}</Text>
+  <Text
+    style={{
+      marginTop: 8,
+      fontSize: 15,
+      color: "#333",
+      lineHeight: 22,
+    }}
+  >
+    {item.task}
+  </Text>
 
-            <Text style={styles.date}>
-              Due: {item.dueDate}
-            </Text>
-          </View>
+  <View
+    style={{
+      marginTop: 15,
+      borderTopWidth: 1,
+      borderColor: "#EEE",
+      paddingTop: 10,
+    }}
+  >
+    <Text style={styles.date}>
+      📅 Due Date: {item.dueDate}
+    </Text>
+  </View>
+</View>
         ))
       )}
     </ScrollView>

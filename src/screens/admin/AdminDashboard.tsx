@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import {
-  SafeAreaView,
   ScrollView,
   View,
   Text,
@@ -13,6 +12,7 @@ import { useNavigation } from "@react-navigation/native";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../firebase/firebaseConfig";
 import { TouchableOpacity } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 export default function AdminDashboard() {
   const navigation = useNavigation<any>();
   const logout = async () => {
@@ -64,8 +64,8 @@ const handleLogout = async () => {
   });
 };
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView>
+    <SafeAreaView style={{ flex: 1 }}>
+      <ScrollView style={styles.container}>
         <View style={styles.header}>
   <Text style={styles.title}>Admin Dashboard</Text>
 

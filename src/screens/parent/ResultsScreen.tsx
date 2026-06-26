@@ -64,18 +64,31 @@ export default function ResultsScreen() {
     );
   }
 
-  const totalMarks = studentResults.reduce(
-    (sum, result) => sum + result.marks,
-    0
-  );
+  const totalObtained = studentResults.reduce(
+  (sum, result) => sum + result.marks,
+  0
+);
 
-  const percentage =
-    studentResults.length > 0
-      ? (
-          totalMarks /
-          studentResults.length
-        ).toFixed(2)
-      : "0";
+const totalMaximum = studentResults.reduce(
+  (sum, result) => sum + result.maxMarks,
+  0
+);
+
+const percentage =
+  totalMaximum > 0
+    ? (
+        (totalObtained / totalMaximum) *
+        100
+      ).toFixed(2)
+    : "0";
+
+const passedSubjects = studentResults.filter(
+  (result) =>
+    (result.marks / result.maxMarks) * 100 >= 35
+).length;
+
+const failedSubjects =
+  studentResults.length - passedSubjects;
 
   return (
     <ScrollView style={styles.container}>
@@ -84,14 +97,22 @@ export default function ResultsScreen() {
       </Text>
 
       <View style={styles.summaryCard}>
-        <Text style={styles.summaryText}>
-          Total Marks: {totalMarks}
-        </Text>
+  <Text style={styles.summaryText}>
+    Total: {totalObtained} / {totalMaximum}
+  </Text>
 
-        <Text style={styles.summaryText}>
-          Percentage: {percentage}%
-        </Text>
-      </View>
+  <Text style={styles.summaryText}>
+    Percentage: {percentage}%
+  </Text>
+
+  <Text style={styles.summaryText}>
+    Passed: {passedSubjects}
+  </Text>
+
+  <Text style={styles.summaryText}>
+    Failed: {failedSubjects}
+  </Text>
+</View>
 
       {studentResults.length === 0 ? (
         <Text style={styles.emptyText}>
@@ -100,17 +121,54 @@ export default function ResultsScreen() {
       ) : (
         studentResults.map((result) => (
           <View
-            key={result.firestoreId}
-            style={styles.card}
-          >
-            <Text style={styles.subject}>
-              {result.subject}
-            </Text>
+  key={result.firestoreId}
+  style={styles.card}
+>
+  <Text style={styles.subject}>
+    📘 {result.subject}
+  </Text>
 
-            <Text style={styles.marks}>
-              Marks: {result.marks}
-            </Text>
-          </View>
+  <Text style={styles.info}>
+    📝 Exam: {result.examType}
+  </Text>
+
+  <Text style={styles.info}>
+    🎯 Marks: {result.marks} / {result.maxMarks}
+  </Text>
+
+  <Text style={styles.info}>
+    📈 Percentage:{" "}
+    {(
+      (result.marks / result.maxMarks) *
+      100
+    ).toFixed(1)}
+    %
+  </Text>
+
+  <Text style={styles.info}>
+    💬 Remarks:
+  </Text>
+
+  <Text style={styles.remarks}>
+    {result.remarks || "No remarks"}
+  </Text>
+
+  <Text
+    style={{
+      marginTop: 10,
+      fontWeight: "bold",
+      color:
+        (result.marks / result.maxMarks) * 100 >=
+        35
+          ? "green"
+          : "red",
+    }}
+  >
+    {(result.marks / result.maxMarks) * 100 >= 35
+      ? "🟢 PASS"
+      : "🔴 FAIL"}
+  </Text>
+</View>
         ))
       )}
     </ScrollView>
@@ -174,4 +232,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "gray",
   },
+  info: {
+  marginTop: 6,
+  fontSize: 15,
+  color: "#444",
+},
+
+remarks: {
+  marginTop: 4,
+  fontStyle: "italic",
+  color: "#666",
+},
 });

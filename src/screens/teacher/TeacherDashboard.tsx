@@ -8,7 +8,7 @@ import {
 import { signOut } from "firebase/auth";
 import { auth } from "../../firebase/firebaseConfig";
 import { useNavigation } from "@react-navigation/native";
-
+import { SafeAreaView } from "react-native-safe-area-context";
 export default function TeacherDashboard() {
   const navigation = useNavigation<any>();
 const handleLogout = async () => {
@@ -19,6 +19,7 @@ const handleLogout = async () => {
   });
 };
   return (
+  <SafeAreaView style={{ flex: 1 }}>
     <ScrollView style={styles.container}>
       <View style={styles.header}>
   <Text style={styles.title}>Teacher Dashboard</Text>
@@ -139,6 +140,7 @@ const handleLogout = async () => {
 </View>
       
     </ScrollView>
+  </SafeAreaView>
   );
 }
 

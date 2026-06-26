@@ -8,11 +8,14 @@ import {
 import { db } from "../firebase/firebaseConfig";
 
 export interface Result {
-  firestoreId: string;
-  studentId: string;
-  subject: string;
-  marks: number;
-  teacherUid?: string;
+    firestoreId: string;
+    studentId: string;
+    subject: string;
+    examType: string;
+    marks: number;
+    maxMarks: number;
+    remarks: string;
+    teacherUid?: string;
 }
 
 export const getResults = async (): Promise<Result[]> => {
@@ -27,13 +30,19 @@ export const getResults = async (): Promise<Result[]> => {
 export const saveResult = async (
   studentId: string,
   subject: string,
+  examType: string,
   marks: number,
+  maxMarks: number,
+  remarks: string,
   teacherUid: string
 ) => {
   await addDoc(collection(db, "results"), {
     studentId,
     subject,
+    examType,
     marks,
+    maxMarks,
+    remarks,
     teacherUid,
     createdAt: serverTimestamp(),
   });
