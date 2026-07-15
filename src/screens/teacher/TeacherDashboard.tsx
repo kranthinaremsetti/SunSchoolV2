@@ -138,7 +138,28 @@ const handleLogout = async () => {
     </Text>
   </TouchableOpacity>
 </View>
-      
+      <View style={styles.row}>
+        <TouchableOpacity
+  style={styles.card}
+  onPress={() =>
+    navigation.navigate("TeacherAnnouncements")
+  }
+>
+  <Text style={styles.cardText}>
+    📢 Announcements
+  </Text>
+</TouchableOpacity>
+<TouchableOpacity
+  style={styles.card}
+  onPress={() =>
+    navigation.navigate("TeacherHolidays")
+  }
+>
+  <Text style={styles.cardText}>
+    📅 Holidays
+  </Text>
+</TouchableOpacity>
+      </View>
     </ScrollView>
   </SafeAreaView>
   );

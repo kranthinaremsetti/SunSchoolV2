@@ -15,10 +15,6 @@ import { TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 export default function AdminDashboard() {
   const navigation = useNavigation<any>();
-  const logout = async () => {
-  await signOut(auth);
-  navigation.replace("Login");
-};
   const [stats, setStats] = useState({
     pending: 0,
     students: 0,
@@ -67,21 +63,26 @@ const handleLogout = async () => {
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView style={styles.container}>
         <View style={styles.header}>
-  <Text style={styles.title}>Admin Dashboard</Text>
+  <Text style={styles.headerTitle}>
+    Admin Dashboard
+  </Text>
 
   <TouchableOpacity onPress={handleLogout}>
-    <Text style={styles.logout}>Logout</Text>
+    <Text style={styles.logout}>
+      🚪 Logout
+    </Text>
   </TouchableOpacity>
 </View>
-        <View style={styles.header}>
-          <Text style={styles.school}>
-            Sun School
-          </Text>
 
-          <Text style={styles.welcome}>
-            Welcome Admin 👋
-          </Text>
-        </View>
+<View style={styles.adminCard}>
+  <Text style={styles.school}>
+    Sun School
+  </Text>
+
+  <Text style={styles.welcome}>
+    Welcome Admin 👋
+  </Text>
+</View>
 
         <View style={styles.grid}>
 
@@ -162,15 +163,11 @@ const styles = StyleSheet.create({
   },
 
   header: {
-    backgroundColor: "#1565C0",
-    padding: 25,
-    borderBottomLeftRadius: 25,
-    borderBottomRightRadius: 25,
-      flexDirection: "row",
+  flexDirection: "row",
   justifyContent: "space-between",
   alignItems: "center",
   marginBottom: 20,
-  },
+},
 
   school: {
     fontSize: 28,
@@ -191,8 +188,8 @@ const styles = StyleSheet.create({
     padding: 15,
   },
 
-title: {
-  fontSize: 28,
+headerTitle: {
+  fontSize: 24,
   fontWeight: "bold",
 },
 
@@ -200,5 +197,11 @@ logout: {
   color: "#1565C0",
   fontWeight: "bold",
   fontSize: 16,
+},
+adminCard: {
+  backgroundColor: "#1565C0",
+  padding: 25,
+  borderRadius: 15,
+  marginBottom: 20,
 },
 });

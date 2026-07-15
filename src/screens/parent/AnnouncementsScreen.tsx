@@ -30,8 +30,12 @@ export default function AnnouncementsScreen() {
         await getAnnouncements();
 
       setAnnouncements(
-        data
-      );
+  data.filter(
+    (item) =>
+      item.audience === "All" ||
+      item.audience === "Parents"
+  )
+);
     };
   return (
     <ScrollView style={styles.container}>
@@ -41,17 +45,37 @@ export default function AnnouncementsScreen() {
 
       {announcements.map((announcement) => (
         <View
-          key={announcement.firestoreId}
-          style={styles.card}
-        >
-          <Text style={styles.cardTitle}>
-            📢 {announcement.title}
-          </Text>
+  key={announcement.firestoreId}
+  style={styles.card}
+>
+  <Text
+    style={[
+      styles.priority,
+      {
+        color:
+          announcement.priority === "Urgent"
+            ? "red"
+            : announcement.priority === "Important"
+            ? "#F59E0B"
+            : "#1565C0",
+      },
+    ]}
+  >
+    {announcement.priority}
+  </Text>
 
-          <Text style={styles.cardMessage}>
-            {announcement.message}
-          </Text>
-        </View>
+  <Text style={styles.cardTitle}>
+    📢 {announcement.title}
+  </Text>
+
+  <Text style={styles.cardMessage}>
+    {announcement.message}
+  </Text>
+
+  <Text style={styles.audience}>
+    Audience: {announcement.audience}
+  </Text>
+</View>
       ))}
     </ScrollView>
   );
@@ -88,4 +112,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#374151",
   },
+  priority: {
+  fontWeight: "bold",
+  fontSize: 15,
+  marginBottom: 8,
+},
+
+audience: {
+  marginTop: 12,
+  color: "gray",
+  fontSize: 13,
+},
 });

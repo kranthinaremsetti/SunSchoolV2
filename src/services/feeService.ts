@@ -6,44 +6,39 @@ import {
 
 import { db } from "../firebase/firebaseConfig";
 export const saveFee = async (
-  studentId: number,
+  studentId: string,
+  academicYear: string,
+  feeType: string,
   totalFee: number,
   paidAmount: number,
   dueDate: string
 ) => {
-  await addDoc(
-    collection(db, "fees"),
-    {
-      studentId,
-      totalFee,
-      paidAmount,
-      dueAmount:
-        totalFee - paidAmount,
-      dueDate,
-    }
-  );
+  const dueAmount = totalFee - paidAmount;
+
+  let status = "Pending";
+
+  if (dueAmount === 0) {
+    status = "Paid";
+  } else if (paidAmount > 0) {
+    status = "Partially Paid";
+  }
+
+  await addDoc(collection(db, "fees"), {
+    studentId,
+    academicYear,
+    feeType,
+    totalFee,
+    paidAmount,
+    dueAmount,
+    dueDate,
+    status,
+  });
 };
 export const getFees = async () => {
-  const feesRef =
-    collection(db, "fees");
+  const snapshot = await getDocs(collection(db, "fees"));
 
-  const snapshot =
-    await getDocs(feesRef);
-  console.log(
-  "Fee Docs:",
-  snapshot.docs.length
-);
   return snapshot.docs.map((doc) => ({
     firestoreId: doc.id,
-    studentId:
-      doc.data().studentId,
-    totalFee:
-      doc.data().totalFee,
-    paidAmount:
-      doc.data().paidAmount,
-    dueAmount:
-      doc.data().dueAmount,
-    dueDate:
-      doc.data().dueDate,
+    ...(doc.data() as any),
   }));
 };

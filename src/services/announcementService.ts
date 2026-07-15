@@ -2,47 +2,36 @@ import {
   collection,
   getDocs,
   addDoc,
+  serverTimestamp,
 } from "firebase/firestore";
 
 import { db } from "../firebase/firebaseConfig";
 
-export const getAnnouncements =
-  async () => {
-    const announcementRef =
-      collection(
-        db,
-        "announcements"
-      );
+export const getAnnouncements = async () => {
+  const snapshot = await getDocs(
+    collection(db, "announcements")
+  );
 
-    const snapshot =
-      await getDocs(
-        announcementRef
-      );
+  return snapshot.docs.map((doc) => ({
+    firestoreId: doc.id,
+    ...(doc.data() as any),
+  }));
+};
 
-    return snapshot.docs.map(
-      (doc) => ({
-        firestoreId: doc.id,
-        title:
-          doc.data().title,
-        message:
-          doc.data().message,
-      })
-    );
-  };
-
-export const saveAnnouncement =
-  async (
-    title: string,
-    message: string
-  ) => {
-    await addDoc(
-      collection(
-        db,
-        "announcements"
-      ),
-      {
-        title,
-        message,
-      }
-    );
-  };
+export const saveAnnouncement = async (
+  title: string,
+  message: string,
+  audience: string,
+  priority: string
+) => {
+  await addDoc(
+    collection(db, "announcements"),
+    {
+      title,
+      message,
+      audience,
+      priority,
+      createdAt: serverTimestamp(),
+    }
+  );
+};

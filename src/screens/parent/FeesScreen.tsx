@@ -47,18 +47,58 @@ export default function FeesScreen() {
     <ScrollView style={styles.container}>
       <Text style={styles.title}>Fees</Text>
 
-      {fees.map((fee) => (
-        <View
-          key={fee.firestoreId}
-          style={styles.card}
-        >
-          <Text>Term: {fee.term}</Text>
+      {fees.length === 0 ? (
+  <Text style={styles.empty}>
+    No fee records available.
+  </Text>
+) : (
+  fees.map((fee) => (
+    <View
+      key={fee.firestoreId}
+      style={styles.card}
+    >
+      <Text style={styles.feeType}>
+        💰 {fee.feeType}
+      </Text>
 
-          <Text>Amount: ₹{fee.amount}</Text>
+      <Text style={styles.info}>
+        🎓 Academic Year: {fee.academicYear}
+      </Text>
 
-          <Text>Status: {fee.status}</Text>
-        </View>
-      ))}
+      <Text style={styles.info}>
+        💵 Total Fee: ₹{fee.totalFee}
+      </Text>
+
+      <Text style={styles.info}>
+        ✅ Paid Amount: ₹{fee.paidAmount}
+      </Text>
+
+      <Text style={styles.info}>
+        ❗ Due Amount: ₹{fee.dueAmount}
+      </Text>
+
+      <Text style={styles.info}>
+        📅 Due Date: {fee.dueDate}
+      </Text>
+
+      <Text
+        style={[
+          styles.status,
+          {
+            color:
+              fee.status === "Paid"
+                ? "green"
+                : fee.status === "Partially Paid"
+                ? "#F59E0B"
+                : "red",
+          },
+        ]}
+      >
+        {fee.status}
+      </Text>
+    </View>
+  ))
+)}
     </ScrollView>
   );
 }
@@ -83,4 +123,28 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     elevation: 2,
   },
+  feeType: {
+  fontSize: 20,
+  fontWeight: "bold",
+  marginBottom: 10,
+},
+
+info: {
+  fontSize: 15,
+  color: "#444",
+  marginTop: 5,
+},
+
+status: {
+  marginTop: 15,
+  fontSize: 17,
+  fontWeight: "bold",
+},
+
+empty: {
+  textAlign: "center",
+  marginTop: 40,
+  fontSize: 16,
+  color: "gray",
+},
 });

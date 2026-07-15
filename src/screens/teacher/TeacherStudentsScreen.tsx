@@ -11,18 +11,23 @@ import {
 } from "react";
 
 import { getStudents } from "../../services/studentService";
-
+import { Picker } from "@react-native-picker/picker";
+import { classesData } from "../../constants/classesData";
 export default function TeacherStudentsScreen() {
   const [students, setStudents] =
     useState<any[]>([]);
-
+  const [selectedClass, setSelectedClass] = useState("");
   const [loading, setLoading] =
     useState(true);
 
   useEffect(() => {
     loadStudents();
   }, []);
-
+  const filteredStudents = students.filter(
+  (student) =>
+    selectedClass === "" ||
+    student.className === selectedClass
+);
 const loadStudents = async () => {
   try {
     const data =
@@ -63,29 +68,53 @@ const loadStudents = async () => {
       <Text style={styles.title}>
         Students
       </Text>
+      <Text style={styles.label}>
+        Select Class
+      </Text>
 
-      {students.map((student) => (
-        <View
-          key={student.id}
-          style={styles.card}
+      <View style={styles.pickerContainer}>
+        <Picker
+          selectedValue={selectedClass}
+          onValueChange={setSelectedClass}
         >
-          <Text style={styles.name}>
-            {student.name}
-          </Text>
+          <Picker.Item
+            label="All Classes"
+            value=""
+          />
 
-          <Text>
-            Class: {student.className}
-          </Text>
+          {classesData.map((cls) => (
+            <Picker.Item
+              key={cls}
+              label={cls}
+              value={cls}
+            />
+          ))}
+        </Picker>
+      </View>
+      {filteredStudents.length === 0 ? (
+  <Text style={styles.empty}>
+    No students found.
+  </Text>
+) : (
+  filteredStudents.map((student) => (
+    <View
+      key={student.id}
+      style={styles.card}
+    >
+      <Text style={styles.name}>
+        {student.name}
+      </Text>
 
-          <Text>
-            Roll No: {student.rollNo}
-          </Text>
+      <Text>
+        Class: {student.className}
+      </Text>
 
-          <Text>
-            Parent ID: {student.parentId}
-          </Text>
-        </View>
-      ))}
+      <Text>
+        Roll No: {student.rollNo}
+      </Text>
+    </View>
+  ))
+)}
     </ScrollView>
   );
 }
@@ -96,7 +125,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#F8FAFC",
     padding: 20,
   },
-
+  empty: {
+  textAlign: "center",
+  color: "gray",
+  marginTop: 30,
+  fontSize: 16,
+},
   title: {
     fontSize: 28,
     fontWeight: "bold",
@@ -116,4 +150,16 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 8,
   },
+  label: {
+  fontSize: 16,
+  fontWeight: "bold",
+  marginBottom: 5,
+},
+
+pickerContainer: {
+  backgroundColor: "white",
+  borderRadius: 10,
+  marginBottom: 20,
+  elevation: 2,
+},
 });

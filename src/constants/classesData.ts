@@ -1,4 +1,7 @@
 export const classesData = [
+  "Nursery",
+  "LKG",
+  "UKG",
   "1",
   "2",
   "3",

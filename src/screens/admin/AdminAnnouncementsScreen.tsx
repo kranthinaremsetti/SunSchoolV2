@@ -13,10 +13,12 @@ import {
   getAnnouncements,
   saveAnnouncement,
 } from "../../services/announcementService";
-
+import { Picker } from "@react-native-picker/picker";
 export default function AdminAnnouncementsScreen() {
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
+  const [audience, setAudience] =useState("All");
+  const [priority, setPriority] = useState("General");
   const [announcements, setAnnouncements] =
     useState<any[]>([]);
 
@@ -38,7 +40,12 @@ export default function AdminAnnouncementsScreen() {
       return;
     }
 
-    await saveAnnouncement(title, message);
+    await saveAnnouncement(
+  title,
+  message,
+  audience,
+  priority
+);
 
     setTitle("");
     setMessage("");
@@ -75,7 +82,41 @@ export default function AdminAnnouncementsScreen() {
         value={message}
         onChangeText={setMessage}
       />
+      <Text style={styles.label}>
+        Audience
+      </Text>
 
+      <Picker
+        selectedValue={audience}
+        onValueChange={setAudience}
+      >
+        <Picker.Item label="All" value="All" />
+        <Picker.Item label="Parents" value="Parents" />
+        <Picker.Item label="Teachers" value="Teachers" />
+      </Picker>
+      <Text style={styles.label}>
+  Priority
+</Text>
+
+<Picker
+  selectedValue={priority}
+  onValueChange={setPriority}
+>
+  <Picker.Item
+    label="General"
+    value="General"
+  />
+
+  <Picker.Item
+    label="Important"
+    value="Important"
+  />
+
+  <Picker.Item
+    label="Urgent"
+    value="Urgent"
+  />
+</Picker>
       <TouchableOpacity
         style={styles.button}
         onPress={addAnnouncement}
@@ -152,4 +193,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginBottom: 6,
   },
+  label: {
+  fontSize: 16,
+  fontWeight: "bold",
+  marginBottom: 5,
+  marginTop: 10,
+},
 });

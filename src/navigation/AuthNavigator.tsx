@@ -31,6 +31,8 @@ import TeacherLeaveRequestScreen from "../screens/teacher/TeacherLeaveRequestScr
 import TeacherLeaveHistoryScreen from "../screens/teacher/TeacherLeaveHistoryScreen";
 import TeacherStudentsScreen from "../screens/teacher/TeacherStudentsScreen";
 import TeacherResultsScreen from "../screens/teacher/TeacherResultsScreen";
+import TeacherAnnouncementsScreen from "../screens/teacher/TeacherAnnouncementsScreen";
+import TeacherHolidayScreen from "../screens/teacher/TeacherHolidayScreen";
 const Stack = createNativeStackNavigator();
 
 export default function AuthNavigator() {
@@ -117,6 +119,16 @@ component={TeacherDashboard}
   name="TeacherLeaveHistory"
   component={TeacherLeaveHistoryScreen}
 />
+<Stack.Screen
+  name="TeacherAnnouncements"
+  component={TeacherAnnouncementsScreen}
+/>
+
+<Stack.Screen
+  name="TeacherHolidays"
+  component={TeacherHolidayScreen}
+/>
+
 <Stack.Screen
 name="AdminDashboard"
 component={AdminDashboard}
