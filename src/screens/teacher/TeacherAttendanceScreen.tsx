@@ -24,7 +24,7 @@ interface StudentAttendance {
 
 export default function TeacherAttendanceScreen() {
   const [selectedClass, setSelectedClass] =
-    useState("5th Class");
+  useState("5");
 
   const [studentsState, setStudentsState] =
     useState<StudentAttendance[]>([]);
@@ -45,7 +45,7 @@ export default function TeacherAttendanceScreen() {
           )
           .map((student: any) => ({
             id: student.id,
-            name: student.name,
+            name: student.studentName,
             className: student.className,
             present: true,
           }));
@@ -111,7 +111,10 @@ export default function TeacherAttendanceScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView
+    style={styles.container}
+    showsVerticalScrollIndicator={false}
+>
       <Text style={styles.title}>
         Take Attendance
       </Text>
@@ -141,7 +144,7 @@ export default function TeacherAttendanceScreen() {
         </Text>
       </View>
 
-      <ScrollView>
+      <View>
         {studentsState.map((student) => (
           <TouchableOpacity
             key={student.id}
@@ -173,8 +176,8 @@ export default function TeacherAttendanceScreen() {
             Submit Attendance
           </Text>
         </TouchableOpacity>
-      </ScrollView>
-    </View>
+      </View>
+    </ScrollView>
   );
 }
 

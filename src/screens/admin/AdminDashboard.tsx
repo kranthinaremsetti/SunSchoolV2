@@ -111,15 +111,24 @@ const handleLogout = async () => {
           />
 
           <DashboardCard
-            title="Attendance"
-          />
+  title="Attendance"
+  onPress={() =>
+    navigation.navigate("AdminAttendance")
+  }
+/>
 
           <DashboardCard
             title="Homework"
+            onPress={() =>
+    navigation.navigate("AdminHomework")
+}
           />
 
           <DashboardCard
             title="Results"
+            onPress={() =>
+    navigation.navigate("AdminResults")
+}
           />
 
          <DashboardCard
