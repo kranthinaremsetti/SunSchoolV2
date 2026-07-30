@@ -4,6 +4,7 @@ import {
   View,
   Text,
   StyleSheet,
+  SafeAreaView,
 } from "react-native";
 
 import { doc, getDoc } from "firebase/firestore";
@@ -44,8 +45,10 @@ export default function FeesScreen() {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>Fees</Text>
+    
+    <SafeAreaView style={{ flex: 1 }}>
+      <ScrollView style={styles.container}>
+        <Text style={styles.title}>Fees</Text>
 
       {fees.length === 0 ? (
   <Text style={styles.empty}>
@@ -100,6 +103,7 @@ export default function FeesScreen() {
   ))
 )}
     </ScrollView>
+    </SafeAreaView>
   );
 }
 

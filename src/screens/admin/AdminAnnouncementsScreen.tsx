@@ -7,6 +7,7 @@ import {
   FlatList,
   StyleSheet,
   Alert,
+  SafeAreaView,
 } from "react-native";
 
 import {
@@ -59,6 +60,7 @@ export default function AdminAnnouncementsScreen() {
   };
 
   return (
+    <SafeAreaView style={{ flex: 1 }}>
     <View style={styles.container}>
 
       <Text style={styles.heading}>
@@ -141,6 +143,7 @@ export default function AdminAnnouncementsScreen() {
       />
 
     </View>
+    </SafeAreaView>
   );
 }
 

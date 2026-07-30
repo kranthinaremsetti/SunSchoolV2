@@ -1,10 +1,12 @@
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 export default function RegisterScreen() {
   const navigation = useNavigation<any>();
 
   return (
+    
+<SafeAreaView style={{ flex: 1 }}>
     <View style={styles.container}>
 
       <Text style={styles.title}>Register</Text>
@@ -36,6 +38,7 @@ export default function RegisterScreen() {
       </TouchableOpacity>
 
     </View>
+    </SafeAreaView>
   );
 }
 

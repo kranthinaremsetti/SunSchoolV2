@@ -4,6 +4,7 @@ import {
   View,
   Text,
   StyleSheet,
+  SafeAreaView,
 } from "react-native";
 
 import { doc, getDoc } from "firebase/firestore";
@@ -86,10 +87,12 @@ setHomework(filtered);
   }
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>
-        Homework
-      </Text>
+    
+    <SafeAreaView style={{ flex: 1 }}>
+      <ScrollView style={styles.container}>
+        <Text style={styles.title}>
+          Homework
+        </Text>
 
       {homework.length === 0 ? (
         <Text
@@ -138,6 +141,7 @@ setHomework(filtered);
         ))
       )}
     </ScrollView>
+    </SafeAreaView>
   );
 }
 

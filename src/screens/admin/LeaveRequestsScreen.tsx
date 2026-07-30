@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  SafeAreaView,
 } from "react-native";
 import { Linking } from "react-native";
 import {
@@ -38,6 +39,7 @@ export default function LeaveRequestsScreen() {
   };
 
   return (
+    <SafeAreaView style={{ flex: 1 }}>
     <FlatList
       data={requests}
       keyExtractor={(item) => item.firestoreId}
@@ -125,6 +127,8 @@ export default function LeaveRequestsScreen() {
 </View>
       )}
     />
+  
+</SafeAreaView>
   );
 }
 

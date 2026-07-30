@@ -6,6 +6,7 @@ import {
   TextInput,
   TouchableOpacity,
   Alert,
+  SafeAreaView,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { auth } from "../../firebase/firebaseConfig";
@@ -45,6 +46,8 @@ export default function TeacherHomeworkScreen() {
   };
 
   return (
+    
+    <SafeAreaView style={{ flex: 1 }}>
     <View style={styles.container}>
       <Text style={styles.title}>Post Homework</Text>
 
@@ -99,6 +102,7 @@ export default function TeacherHomeworkScreen() {
         </Text>
       </TouchableOpacity>
     </View>
+    </SafeAreaView>
   );
 }
 

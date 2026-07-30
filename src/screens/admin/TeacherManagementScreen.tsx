@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  SafeAreaView,
 } from "react-native";
 
 import {
@@ -64,10 +65,11 @@ export default function TeacherManagementScreen() {
   };
 
   return (
-    <FlatList
-      data={teachers}
-      keyExtractor={(item) => item.id}
-      contentContainerStyle={{
+    <SafeAreaView style={{ flex: 1 }}>
+      <FlatList
+        data={teachers}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={{
         padding: 15,
       }}
       renderItem={({ item }) => (
@@ -101,6 +103,7 @@ export default function TeacherManagementScreen() {
         </View>
       )}
     />
+    </SafeAreaView>
   );
 }
 

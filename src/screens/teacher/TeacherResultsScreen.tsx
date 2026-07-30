@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  SafeAreaView,
 } from "react-native";
 import { auth } from "../../firebase/firebaseConfig";
 import { saveResult } from "../../services/resultService";
@@ -81,6 +82,8 @@ const [remarks, setRemarks] = useState("");
 };
 
   return (
+    
+    <SafeAreaView style={{ flex: 1 }}>
     <View style={styles.container}>
       <Text style={styles.title}>
         Enter Marks
@@ -202,6 +205,7 @@ const [remarks, setRemarks] = useState("");
         </Text>
       </TouchableOpacity>
     </View>
+    </SafeAreaView>
   );
 }
 

@@ -5,6 +5,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
+  SafeAreaView,
 } from "react-native";
 import { useState, useEffect } from "react";
 import { Picker } from "@react-native-picker/picker";
@@ -111,6 +112,8 @@ export default function TeacherAttendanceScreen() {
   };
 
   return (
+    
+    <SafeAreaView style={{ flex: 1 }}>
     <ScrollView
     style={styles.container}
     showsVerticalScrollIndicator={false}
@@ -178,6 +181,7 @@ export default function TeacherAttendanceScreen() {
         </TouchableOpacity>
       </View>
     </ScrollView>
+    </SafeAreaView>
   );
 }
 

@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  SafeAreaView,
 } from "react-native";
 
 import { Picker } from "@react-native-picker/picker";
@@ -67,6 +68,7 @@ export default function FeeManagementScreen() {
   };
 
   return (
+    <SafeAreaView style={{ flex: 1 }}>
     <View style={styles.container}>
 
       <Text style={styles.heading}>
@@ -200,6 +202,7 @@ export default function FeeManagementScreen() {
       </TouchableOpacity>
 
     </View>
+    </SafeAreaView>
   );
 }
 

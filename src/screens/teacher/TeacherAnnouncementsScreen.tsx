@@ -4,6 +4,7 @@ import {
   View,
   Text,
   StyleSheet,
+  SafeAreaView,
 } from "react-native";
 
 import { getAnnouncements } from "../../services/announcementService";
@@ -28,6 +29,8 @@ export default function TeacherAnnouncementsScreen() {
   };
 
   return (
+    
+    <SafeAreaView style={{ flex: 1 }}>
     <ScrollView style={styles.container}>
       <Text style={styles.title}>
         Announcements
@@ -74,6 +77,7 @@ export default function TeacherAnnouncementsScreen() {
         ))
       )}
     </ScrollView>
+    </SafeAreaView>
   );
 }
 

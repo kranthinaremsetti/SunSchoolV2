@@ -3,6 +3,7 @@ import {
   View,
   Text,
   StyleSheet,
+  SafeAreaView,
 } from "react-native";
 
 import {
@@ -64,6 +65,8 @@ const loadStudents = async () => {
   }
 
   return (
+    
+    <SafeAreaView style={{ flex: 1 }}>
     <ScrollView style={styles.container}>
       <Text style={styles.title}>
         Students
@@ -116,6 +119,7 @@ const loadStudents = async () => {
   ))
 )}
     </ScrollView>
+    </SafeAreaView>
   );
 }
 

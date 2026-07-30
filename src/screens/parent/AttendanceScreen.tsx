@@ -4,6 +4,7 @@ import {
   View,
   Text,
   StyleSheet,
+  SafeAreaView,
 } from "react-native";
 
 import { doc, getDoc } from "firebase/firestore";
@@ -76,7 +77,9 @@ const [loading, setLoading] = useState(true);
   );
 }
   return (
-    <ScrollView style={styles.container}>
+    
+    <SafeAreaView style={{ flex: 1 }}>
+      <ScrollView style={styles.container}>
 
       <Text style={styles.title}>
         Attendance
@@ -134,6 +137,7 @@ const [loading, setLoading] = useState(true);
 )}
 
     </ScrollView>
+    </SafeAreaView>
   );
 }
 

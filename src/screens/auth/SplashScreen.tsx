@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { View, Text, ActivityIndicator } from "react-native";
+import { View, Text, ActivityIndicator, SafeAreaView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { auth, db } from "../../firebase/firebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
@@ -61,6 +61,8 @@ export default function SplashScreen() {
   }
 
   return (
+    
+    <SafeAreaView style={{ flex: 1 }}>
     <View
       style={{
         flex: 1,
@@ -85,5 +87,6 @@ export default function SplashScreen() {
         style={{ marginTop: 20 }}
       />
     </View>
+    </SafeAreaView>
   );
 }

@@ -7,6 +7,7 @@ import {
   FlatList,
   StyleSheet,
   Alert,
+  SafeAreaView,
 } from "react-native";
 
 import {
@@ -80,6 +81,7 @@ export default function HolidayManagementScreen() {
   };
 
   return (
+    <SafeAreaView style={{ flex: 1 }}>
     <View style={styles.container}>
 
       <Text style={styles.heading}>
@@ -143,6 +145,7 @@ export default function HolidayManagementScreen() {
       />
 
     </View>
+    </SafeAreaView>
   );
 }
 

@@ -4,6 +4,7 @@ import {
   View,
   Text,
   StyleSheet,
+  SafeAreaView,
 } from "react-native";
 
 import { doc, getDoc } from "firebase/firestore";
@@ -91,6 +92,8 @@ const failedSubjects =
   studentResults.length - passedSubjects;
 
   return (
+    
+    <SafeAreaView style={{ flex: 1 }}>
     <ScrollView style={styles.container}>
       <Text style={styles.title}>
         Results
@@ -172,6 +175,7 @@ const failedSubjects =
         ))
       )}
     </ScrollView>
+    </SafeAreaView>
   );
 }
 

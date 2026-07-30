@@ -3,6 +3,7 @@ import {
   Text,
   StyleSheet,
   ScrollView,
+  SafeAreaView,
 } from "react-native";
 
 import {
@@ -38,6 +39,8 @@ export default function AnnouncementsScreen() {
 );
     };
   return (
+    
+    <SafeAreaView style={{ flex: 1 }}>
     <ScrollView style={styles.container}>
       <Text style={styles.title}>
         Announcements
@@ -78,6 +81,7 @@ export default function AnnouncementsScreen() {
 </View>
       ))}
     </ScrollView>
+    </SafeAreaView>
   );
 }
 

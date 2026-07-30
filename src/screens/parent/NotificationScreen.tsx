@@ -4,6 +4,7 @@ import {
   View,
   Text,
   StyleSheet,
+  SafeAreaView,
 } from "react-native";
 
 import { doc, getDoc } from "firebase/firestore";
@@ -66,6 +67,8 @@ export default function NotificationScreen() {
   }
 
   return (
+    
+    <SafeAreaView style={{ flex: 1 }}>
     <ScrollView style={styles.container}>
       <Text style={styles.title}>
         Notifications
@@ -90,6 +93,7 @@ export default function NotificationScreen() {
         ))
       )}
     </ScrollView>
+    </SafeAreaView>
   );
 }
 

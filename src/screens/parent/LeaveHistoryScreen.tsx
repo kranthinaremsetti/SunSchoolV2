@@ -4,6 +4,7 @@ import {
   View,
   Text,
   StyleSheet,
+  SafeAreaView,
 } from "react-native";
 
 import { doc, getDoc } from "firebase/firestore";
@@ -48,10 +49,12 @@ export default function LeaveHistoryScreen() {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>
-        Leave History
-      </Text>
+    
+    <SafeAreaView style={{ flex: 1 }}>
+      <ScrollView style={styles.container}>
+        <Text style={styles.title}>
+          Leave History
+        </Text>
 
       {leaveHistory.length === 0 ? (
         <Text style={styles.empty}>
@@ -93,6 +96,7 @@ export default function LeaveHistoryScreen() {
         ))
       )}
     </ScrollView>
+    </SafeAreaView>
   );
 }
 

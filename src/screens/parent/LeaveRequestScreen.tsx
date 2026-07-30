@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  SafeAreaView,
 } from "react-native";
 
 import { auth, db } from "../../firebase/firebaseConfig";
@@ -68,10 +69,12 @@ export default function LeaveRequestScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>
-        Leave Request
-      </Text>
+    
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={styles.container}>
+        <Text style={styles.title}>
+          Leave Request
+        </Text>
 
       <View style={styles.pickerContainer}>
         <Picker
@@ -150,6 +153,7 @@ export default function LeaveRequestScreen() {
         </Text>
       </TouchableOpacity>
     </View>
+    </SafeAreaView>
   );
 }
 

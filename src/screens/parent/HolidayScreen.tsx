@@ -4,6 +4,7 @@ import {
   View,
   Text,
   StyleSheet,
+  SafeAreaView,
 } from "react-native";
 
 import { getHolidays } from "../../services/holidayService";
@@ -25,6 +26,7 @@ export default function HolidayScreen() {
   };
 
   return (
+    <SafeAreaView style={{ flex: 1 }}>
     <ScrollView style={styles.container}>
       <Text style={styles.title}>
         📅 School Holidays
@@ -43,6 +45,7 @@ export default function HolidayScreen() {
         </View>
       ))}
     </ScrollView>
+    </SafeAreaView>
   );
 }
 

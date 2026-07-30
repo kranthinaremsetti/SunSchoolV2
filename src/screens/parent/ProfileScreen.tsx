@@ -3,6 +3,7 @@ import {
   View,
   Text,
   StyleSheet,
+  SafeAreaView,
 } from "react-native";
 
 import { doc, getDoc } from "firebase/firestore";
@@ -75,6 +76,8 @@ export default function ProfileScreen() {
   }
 
   return (
+    
+    <SafeAreaView style={{ flex: 1 }}>
     <View style={styles.container}>
       <Text style={styles.title}>
         Student Profile
@@ -99,6 +102,7 @@ export default function ProfileScreen() {
         <Text style={styles.value}>{student.parentId}</Text>
       </View>
     </View>
+    </SafeAreaView>
   );
 }
 
