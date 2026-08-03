@@ -7,6 +7,7 @@ import {
   where,
   getDoc,
   addDoc,
+  deleteDoc,
 } from "firebase/firestore";
 import { db } from "../firebase/firebaseConfig";
 
@@ -53,7 +54,7 @@ export async function approveUser(uid: string) {
     const studentRef = await addDoc(
   collection(db, "students"),
   {
-    name: parent.studentName,
+    studentName: parent.studentName,
     rollNo: parent.rollNo,
     className: parent.className,
     section: parent.section,
@@ -62,22 +63,23 @@ export async function approveUser(uid: string) {
   }
 );
 
-    await updateDoc(
-      doc(db, "users", uid),
-      {
-        status: "approved",
-        studentId: studentRef.id,
-      }
-    );
+await updateDoc(
+  doc(db, "users", uid),
+  {
+    status: "approved",
+    studentId: studentRef.id,
+  }
+);
 
-    await updateDoc(
-      doc(db, "parents", uid),
-      {
-        linkedStudent: true,
-      }
-    );
+await updateDoc(
+  doc(db, "parents", uid),
+  {
+    linkedStudent: true,
+    studentId: studentRef.id,
+  }
+);
 
-    return;
+return;
   }
 
   // -------------------------
@@ -95,8 +97,24 @@ export async function approveUser(uid: string) {
   }
 }
 
+
+
 export async function rejectUser(uid: string) {
-  await updateDoc(doc(db, "users", uid), {
-    status: "rejected",
-  });
+  const userDoc = await getDoc(doc(db, "users", uid));
+
+  if (!userDoc.exists()) {
+    throw new Error("User not found");
+  }
+
+  const user: any = userDoc.data();
+
+  if (user.role === "parent") {
+    await deleteDoc(doc(db, "parents", uid));
+  }
+
+  if (user.role === "teacher") {
+    await deleteDoc(doc(db, "teachers", uid));
+  }
+
+  await deleteDoc(doc(db, "users", uid));
 }

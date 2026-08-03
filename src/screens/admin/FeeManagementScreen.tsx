@@ -113,7 +113,7 @@ export default function FeeManagementScreen() {
   .map((student) => (
     <Picker.Item
       key={student.id}
-      label={`${student.rollNo} - ${student.name}`}
+      label={`${student.rollNo} - ${student.studentName||student.name }`}
       value={student.id}
     />
 ))}

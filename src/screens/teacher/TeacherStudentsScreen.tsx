@@ -105,7 +105,7 @@ const loadStudents = async () => {
       style={styles.card}
     >
       <Text style={styles.name}>
-        {student.name}
+        {student.studentName||student.name}
       </Text>
 
       <Text>

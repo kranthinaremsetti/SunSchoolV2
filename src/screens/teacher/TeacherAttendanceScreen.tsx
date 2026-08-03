@@ -46,7 +46,7 @@ export default function TeacherAttendanceScreen() {
           )
           .map((student: any) => ({
             id: student.id,
-            name: student.studentName,
+            name: student.studentName||student.name ,
             className: student.className,
             present: true,
           }));

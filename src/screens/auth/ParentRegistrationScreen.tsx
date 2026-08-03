@@ -45,6 +45,23 @@ export default function ParentRegistrationScreen() {
       "Success",
       "Registration Submitted.\nWait for Admin Approval."
     );
+    setFatherName("");
+setMotherName("");
+
+setMobile("");
+setEmail("");
+
+setPassword("");
+setConfirmPassword("");
+
+setStudentName("");
+setRollNo("");
+
+setStudentClass("");
+setSection("");
+
+setDob("");
+setAadhaar("");
 
   } catch (error: any) {
     Alert.alert(

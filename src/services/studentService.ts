@@ -1,30 +1,61 @@
 import {
   collection,
-  addDoc,
   getDocs,
   deleteDoc,
   doc,
   updateDoc,
   query,
   where,
+  getDoc,
 } from "firebase/firestore";
 
 import { db } from "../firebase/firebaseConfig";
 
-export async function addStudent(student: any) {
-  return await addDoc(collection(db, "students"), student);
-}
-
 export async function getStudents() {
   const snapshot = await getDocs(collection(db, "students"));
 
-  return snapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-  }));
+  const students = [];
+
+  for (const studentDoc of snapshot.docs) {
+    const student: any = studentDoc.data();
+
+    let parentName = "-";
+    let mobile = "-";
+
+    if (student.parentId) {
+      const parentDoc = await getDoc(
+        doc(db, "parents", student.parentId)
+      );
+
+      const userDoc = await getDoc(
+        doc(db, "users", student.parentId)
+      );
+
+      if (parentDoc.exists()) {
+        parentName =
+          parentDoc.data().fatherName || "-";
+      }
+
+      if (userDoc.exists()) {
+        mobile =
+          userDoc.data().mobile || "-";
+      }
+    }
+
+    students.push({
+      id: studentDoc.id,
+      ...student,
+      parentName,
+      mobile,
+    });
+  }
+
+  return students;
 }
 
-export async function getStudentByParent(parentId: string) {
+export async function getStudentByParent(
+  parentId: string
+) {
   const q = query(
     collection(db, "students"),
     where("parentId", "==", parentId)

@@ -147,7 +147,7 @@ export default function AdminAttendanceScreen() {
     >
       <View>
         <Text style={styles.studentName}>
-          {item.studentName}
+          {item.studentName||item.name}
         </Text>
 
         <Text>

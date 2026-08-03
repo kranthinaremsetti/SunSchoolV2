@@ -12,7 +12,7 @@ import {
   StyleSheet,
   Alert,
 } from "react-native";
-
+import { Picker } from "@react-native-picker/picker";
 import {
   getPendingUsers,
   approveUser,
@@ -21,7 +21,7 @@ import {
 
 export default function PendingRegistrationsScreen() {
   const [users, setUsers] = useState<any[]>([]);
-
+  const [filterRole, setFilterRole] = useState("All");
   const loadUsers = async () => {
     const data = await getPendingUsers();
     setUsers(data);
@@ -69,7 +69,9 @@ export default function PendingRegistrationsScreen() {
       <Text>
         {item.mobile}
       </Text>
-
+      <Text style={styles.role}>
+        Role : {item.role}
+      </Text>
       <View style={styles.row}>
 
         <TouchableOpacity
@@ -98,10 +100,41 @@ export default function PendingRegistrationsScreen() {
     </View>
   );
 
+  const filteredUsers = users.filter((user) => {
+  if (filterRole === "All") return true;
+
+  return user.role === filterRole.toLowerCase();
+});
   return (
     <SafeAreaView style={styles.container}>
+      <Text style={styles.label}>
+  Filter By
+</Text>
+
+<View style={styles.pickerContainer}>
+  <Picker
+    selectedValue={filterRole}
+    onValueChange={setFilterRole}
+  >
+    <Picker.Item
+      label="All"
+      value="All"
+    />
+
+    <Picker.Item
+      label="Parents"
+      value="Parents"
+    />
+
+    <Picker.Item
+      label="Teachers"
+      value="Teachers"
+    />
+  </Picker>
+</View>
       <FlatList
-        data={users}
+        
+        data={filteredUsers}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         ListEmptyComponent={
@@ -125,7 +158,24 @@ const styles = StyleSheet.create({
     backgroundColor:"#F5F7FA",
     padding:15,
   },
+  label: {
+  fontSize: 16,
+  fontWeight: "bold",
+  marginBottom: 5,
+},
 
+pickerContainer: {
+  backgroundColor: "white",
+  borderRadius: 10,
+  marginBottom: 20,
+  elevation: 2,
+},
+
+role: {
+  color: "#1565C0",
+  fontWeight: "bold",
+  marginTop: 5,
+},
   card:{
     backgroundColor:"white",
     padding:15,

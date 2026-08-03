@@ -11,7 +11,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "../../firebase/firebaseConfig";
 
 interface Student {
-  name: string;
+  studentName: string;
   className: string;
   rollNo: string;
   parentId: string;
@@ -85,7 +85,7 @@ export default function ProfileScreen() {
 
       <View style={styles.card}>
         <Text style={styles.label}>Name</Text>
-        <Text style={styles.value}>{student.name}</Text>
+        <Text style={styles.value}>{student.studentName}</Text>
 
         <Text style={styles.label}>Class</Text>
         <Text style={styles.value}>{student.className}</Text>
