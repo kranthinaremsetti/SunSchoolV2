@@ -26,7 +26,7 @@ const loadStudents = async () => {
   setStudents(data);
 };
   const [studentId, setStudentId] =
-  useState("1");
+  useState("");
 
   const [subject, setSubject] =
     useState("Mathematics");
@@ -57,6 +57,7 @@ const [remarks, setRemarks] = useState("");
   );
   return;
 }
+console.log("Selected Student ID:", studentId);
     await saveResult(
   studentId,
   subject,
@@ -113,21 +114,31 @@ const [remarks, setRemarks] = useState("");
       </Text>
 
       <Picker
-        selectedValue={studentId}
-        onValueChange={(itemValue) =>
-          setStudentId(itemValue)
-        }
-      >
-        {students
-  .filter(student => student.className === className)
-  .map(student => (
-    <Picker.Item
-      key={student.id}
-      label={`${student.rollNo} - ${student.studentName||student.name}`}
-      value={student.id}
-    />
-))}
-      </Picker>
+  selectedValue={studentId}
+  onValueChange={(itemValue) =>
+    setStudentId(itemValue)
+  }
+>
+  <Picker.Item
+    label="Select Student"
+    value=""
+  />
+
+  {students
+    .filter(
+      (student) =>
+        student.className === className
+    )
+    .map((student) => (
+      <Picker.Item
+        key={student.id}
+        label={`${student.rollNo} - ${
+          student.studentName || student.name
+        }`}
+        value={student.id}
+      />
+    ))}
+</Picker>
 
       <Text style={styles.label}>
         Select Subject

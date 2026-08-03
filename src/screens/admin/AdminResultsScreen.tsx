@@ -102,7 +102,10 @@ export default function AdminResultsScreen() {
           </Text>
         ) : (
           results.map((item) => (
-            <View key={item.id} style={styles.card}>
+            <View
+            key={item.firestoreId}
+            style={styles.card}
+          >
               <Text style={styles.studentName}>
                 {item.studentName}
               </Text>
