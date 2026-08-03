@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -5,177 +6,219 @@ import {
   TouchableOpacity,
   ScrollView,
 } from "react-native";
-import { signOut } from "firebase/auth";
-import { auth } from "../../firebase/firebaseConfig";
-import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useNavigation } from "@react-navigation/native";
+
+import { signOut } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+
+import { auth, db } from "../../firebase/firebaseConfig";
+
 export default function TeacherDashboard() {
   const navigation = useNavigation<any>();
-const handleLogout = async () => {
-  await signOut(auth);
-  navigation.reset({
-    index: 0,
-    routes: [{ name: "Login" }],
-  });
-};
+
+  const [teacher, setTeacher] = useState<any>(null);
+
+  useEffect(() => {
+    loadTeacher();
+  }, []);
+
+  const loadTeacher = async () => {
+    try {
+      const uid = auth.currentUser?.uid;
+
+      if (!uid) return;
+
+      const teacherSnap = await getDoc(
+        doc(db, "teachers", uid)
+      );
+
+      if (teacherSnap.exists()) {
+        setTeacher({
+          id: teacherSnap.id,
+          ...teacherSnap.data(),
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleLogout = async () => {
+    await signOut(auth);
+
+    navigation.reset({
+      index: 0,
+      routes: [{ name: "Login" }],
+    });
+  };
+
   return (
-  <SafeAreaView style={{ flex: 1 }}>
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-  <Text style={styles.title}>Teacher Dashboard</Text>
+    <SafeAreaView style={{ flex: 1 }}>
+      <ScrollView
+        style={styles.container}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.header}>
+  <Text style={styles.title}>
+    Teacher Dashboard
+  </Text>
 
   <TouchableOpacity onPress={handleLogout}>
-    <Text style={styles.logout}>Logout</Text>
+    <Text style={styles.logout}>
+      Logout
+    </Text>
   </TouchableOpacity>
 </View>
-          <View style={styles.teacherCard}>
-  <Text style={styles.teacherName}>
-    👨‍🏫 Teacher
-  </Text>
 
-  <Text style={styles.teacherInfo}>
-    Qualification: --
-  </Text>
+        {/* Teacher Card */}
 
-  <Text style={styles.teacherInfo}>
-    Subject: --
-  </Text>
-</View>
-    <View style={styles.row}>
-  <View style={styles.summaryCard}>
-    <Text style={styles.summaryValue}>
-      35
-    </Text>
-    <Text>Students</Text>
-  </View>
-
-  <View style={styles.summaryCard}>
-    <Text style={styles.summaryValue}>
-      2
-    </Text>
-    <Text>Leave Requests</Text>
-  </View>
-</View>
-      <View style={styles.row}>
-        <TouchableOpacity
-          style={styles.card}
-          onPress={() =>
-            navigation.navigate(
-              "TeacherAttendance"
-            )
-          }
-        >
-          <Text style={styles.cardText}>
-           📅 Attendance
+        <View style={styles.teacherCard}>
+          <Text style={styles.teacherName}>
+            👨‍🏫 {teacher?.teacherName || "Teacher"}
           </Text>
-        </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.card}
-          onPress={() =>
-            navigation.navigate(
-              "TeacherHomework"
-            )
-          }
-        >
-          <Text style={styles.cardText}>
-            📝 Homework
+          <Text style={styles.teacherInfo}>
+            📚 Subject: {teacher?.subject || "-"}
           </Text>
-        </TouchableOpacity>
-      </View>
 
-      <View style={styles.row}>
-  <TouchableOpacity
-    style={styles.card}
-    onPress={() =>
-      navigation.navigate(
-        "TeacherStudents"
-      )
-    }
-  >
-    <Text style={styles.cardText}>
-      👥 Students
-    </Text>
-  </TouchableOpacity>
+          <Text style={styles.teacherInfo}>
+            🎓 Qualification: {teacher?.qualification || "-"}
+          </Text>
 
-  <TouchableOpacity
-    style={styles.card}
-    onPress={() =>
-      navigation.navigate(
-        "TeacherResults"
-      )
-    }
-  >
-    <Text style={styles.cardText}>
-      📊 Results
-    </Text>
-  </TouchableOpacity>
-      </View>
-      <View style={styles.row}>
-  <TouchableOpacity
-    style={styles.card}
-    onPress={() =>
-      navigation.navigate(
-        "TeacherLeaveRequest"
-      )
-    }
-  >
-    <Text style={styles.cardText}>
-      📝 Apply Leave
-    </Text>
-  </TouchableOpacity>
+          <Text style={styles.teacherInfo}>
+            💼 Experience: {teacher?.experience || "-"} Years
+          </Text>
+        </View>
 
-  <TouchableOpacity
-    style={styles.card}
-    onPress={() =>
-      navigation.navigate(
-        "TeacherLeaveHistory"
-      )
-    }
-  >
-    <Text style={styles.cardText}>
-      📄 Leave History
-    </Text>
-  </TouchableOpacity>
-</View>
-      <View style={styles.row}>
+        {/* Row 1 */}
+
+        <View style={styles.row}>
+          <DashboardButton
+            title="📅 Attendance"
+            screen="TeacherAttendance"
+            navigation={navigation}
+          />
+
+          <DashboardButton
+            title="👤 Profile"
+            screen="TeacherProfile"
+            navigation={navigation}
+          />
+        </View>
+
+        {/* Row 2 */}
+
+        <View style={styles.row}>
+          <DashboardButton
+            title="📊 Results"
+            screen="TeacherResults"
+            navigation={navigation}
+          />
+
+          <DashboardButton
+            title="📝 Homework"
+            screen="TeacherHomework"
+            navigation={navigation}
+          />
+        </View>
+
+        {/* Row 3 */}
+
+        <View style={styles.row}>
+          <DashboardButton
+            title="📝 Apply Leave"
+            screen="TeacherLeaveRequest"
+            navigation={navigation}
+          />
+
+          <DashboardButton
+            title="📄 Leave History"
+            screen="TeacherLeaveHistory"
+            navigation={navigation}
+          />
+        </View>
+
+        {/* Row 4 */}
+
+        <View style={styles.row}>
+          <DashboardButton
+            title="📢 Announcements"
+            screen="TeacherAnnouncements"
+            navigation={navigation}
+          />
+
+          <DashboardButton
+            title="📅 Holidays"
+            screen="TeacherHolidays"
+            navigation={navigation}
+          />
+        </View>
+
+        {/* Row 5 */}
+
         <TouchableOpacity
-  style={styles.card}
-  onPress={() =>
-    navigation.navigate("TeacherAnnouncements")
-  }
+  style={styles.fullWidthCard}
+  onPress={() => navigation.navigate("TeacherStudents")}
 >
   <Text style={styles.cardText}>
-    📢 Announcements
+    👥 Students
   </Text>
 </TouchableOpacity>
-<TouchableOpacity
-  style={styles.card}
-  onPress={() =>
-    navigation.navigate("TeacherHolidays")
-  }
->
-  <Text style={styles.cardText}>
-    📅 Holidays
-  </Text>
-</TouchableOpacity>
-      </View>
-    </ScrollView>
-  </SafeAreaView>
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+function DashboardButton({
+  title,
+  screen,
+  navigation,
+}: any) {
+  return (
+    <TouchableOpacity
+      style={styles.card}
+      onPress={() => navigation.navigate(screen)}
+    >
+      <Text style={styles.cardText}>
+        {title}
+      </Text>
+    </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
     backgroundColor: "#F8FAFC",
+    padding: 20,
   },
 
   title: {
     fontSize: 28,
     fontWeight: "bold",
-    marginBottom: 25,
+    marginBottom: 20,
+  },
+
+  teacherCard: {
+    backgroundColor: "white",
+    padding: 20,
+    borderRadius: 12,
+    elevation: 3,
+    marginBottom: 20,
+  },
+
+  teacherName: {
+    fontSize: 22,
+    fontWeight: "bold",
+    marginBottom: 10,
+    color: "#1565C0",
+  },
+
+  teacherInfo: {
+    fontSize: 16,
+    color: "#555",
+    marginTop: 6,
   },
 
   row: {
@@ -195,53 +238,35 @@ const styles = StyleSheet.create({
   },
 
   cardText: {
-  fontSize: 16,
-  fontWeight: "bold",
-  textAlign: "center",
-},
-  teacherCard: {
+    fontSize: 16,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  fullWidthCard: {
   backgroundColor: "white",
-  padding: 20,
+  height: 80,
   borderRadius: 12,
-  elevation: 3,
-  marginBottom: 20,
-},
-
-teacherName: {
-  fontSize: 22,
-  fontWeight: "bold",
-},
-
-teacherInfo: {
-  marginTop: 5,
-  color: "gray",
-},
-summaryCard: {
-  backgroundColor: "white",
-  width: "48%",
-  padding: 15,
-  borderRadius: 12,
+  justifyContent: "center",
   alignItems: "center",
   elevation: 3,
   marginBottom: 15,
 },
 
-summaryValue: {
-  fontSize: 24,
-  fontWeight: "bold",
-  color: "#2563EB",
-},
-header: {
-  flexDirection: "row",
-  justifyContent: "space-between",
-  alignItems: "center",
-  marginBottom: 20,
-},
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 20,
+  },
 
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+  },
 
-logout: {
-  color: "#1565C0",
-  fontWeight: "bold",
-  fontSize: 16,
-},
+  logout: {
+    color: "#1565C0",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
 });
