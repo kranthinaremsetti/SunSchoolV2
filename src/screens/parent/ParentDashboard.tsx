@@ -10,15 +10,17 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
-
+import { getStudentAttendance } from "../../services/attendanceService";
 import { auth, db } from "../../firebase/firebaseConfig";
-
+import { getStudentFees } from "../../services/feeService";
+import { getStudentNotifications } from "../../services/notificationService";
 export default function ParentDashboard() {
   const navigation = useNavigation<any>();
-
+  const [notificationCount, setNotificationCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [student, setStudent] = useState<any>(null);
-
+  const [attendancePercentage, setAttendancePercentage] = useState(0);
+  const [pendingFee, setPendingFee] = useState(0);
   useEffect(() => {
     loadStudent();
   }, []);
@@ -51,15 +53,49 @@ console.log("Student ID:", user.studentId);
       );
       console.log("Student Exists:", studentSnap.exists());
 
-if (studentSnap.exists()) {
-  console.log(studentSnap.data());
-}
       if (studentSnap.exists()) {
-        setStudent({
-          id: studentSnap.id,
-          ...studentSnap.data(),
-        });
+        console.log(studentSnap.data());
       }
+     if (studentSnap.exists()) {
+
+      const studentData = {
+        id: studentSnap.id,
+        ...studentSnap.data(),
+      };
+
+      setStudent(studentData);
+
+      const attendance =
+        await getStudentAttendance(studentData.id);
+
+      const present = attendance.filter(
+        (a) => a.status === "Present"
+      ).length;
+
+      const percentage =
+        attendance.length === 0
+          ? 0
+          : Math.round(
+              (present / attendance.length) * 100
+            );
+
+      setAttendancePercentage(percentage);
+      const fees = await getStudentFees(studentData.id);
+
+        if (fees.length > 0) {
+          const pending = fees.reduce(
+            (sum: number, fee: any) =>
+              sum + (fee.dueAmount - fee.paidAmount),
+            0
+          );
+
+          setPendingFee(pending);
+        }
+        const notifications =
+        await getStudentNotifications(studentData.id);
+
+      setNotificationCount(notifications.length);
+    }
 
     } catch (e) {
       console.log(e);
@@ -103,7 +139,7 @@ if (studentSnap.exists()) {
 
         <View style={styles.studentCard}>
           <Text style={styles.studentName}>
-            {student?.name || "Student"}
+            {student?.studentName || student?.name || "Student"}
           </Text>
 
           <Text style={styles.studentInfo}>
@@ -122,16 +158,19 @@ if (studentSnap.exists()) {
         <View style={styles.row}>
           <View style={styles.summaryCard}>
             <Text style={styles.summaryValue}>
-              92%
+              {attendancePercentage}%
             </Text>
             <Text>Attendance</Text>
           </View>
 
           <View style={styles.summaryCard}>
-            <Text style={styles.summaryValue}>
-              ₹5000
-            </Text>
-            <Text>Fees Due</Text>
+          <Text style={styles.summaryValue}>
+          ₹{pendingFee}
+        </Text>
+
+        <Text>
+          Fees Due
+        </Text>
           </View>
         </View>
 
@@ -140,8 +179,8 @@ if (studentSnap.exists()) {
           onPress={() => navigation.navigate("Notifications")}
         >
           <Text style={styles.notificationButtonText}>
-            View Notifications 🔔
-          </Text>
+          🔔 Notifications ({notificationCount})
+        </Text>
         </TouchableOpacity>
 
         <View style={styles.row}>

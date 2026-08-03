@@ -42,3 +42,20 @@ export const getFees = async () => {
     ...(doc.data() as any),
   }));
 };
+export const getStudentFees = async (
+  studentId: string
+) => {
+  const snapshot = await getDocs(
+    collection(db, "fees")
+  );
+
+  return snapshot.docs
+    .map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }))
+    .filter(
+      (fee: any) =>
+        fee.studentId === studentId
+    );
+  };

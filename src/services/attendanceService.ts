@@ -18,7 +18,15 @@ export const getAttendanceRecords = async () => {
     status: doc.data().status,
   }));
 };
+export const getStudentAttendance = async (
+  studentId: string
+) => {
+  const records = await getAttendanceRecords();
 
+  return records.filter(
+    (record) => record.studentId === studentId
+  );
+};
 export const saveAttendance = async (
   studentId: string,
   date: string,

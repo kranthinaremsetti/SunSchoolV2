@@ -38,3 +38,20 @@ export const saveNotification = async (
     }
   );
 };
+export const getStudentNotifications = async (
+  studentId: string
+) => {
+  const snapshot = await getDocs(
+    collection(db, "notifications")
+  );
+
+  return snapshot.docs
+    .map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }))
+    .filter(
+      (notification: any) =>
+        notification.studentId === studentId
+    );
+};

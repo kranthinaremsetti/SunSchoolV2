@@ -27,29 +27,31 @@ useState<AttendanceRecord[]>([]);
   }, []);
 const [loading, setLoading] = useState(true);
   const loadAttendance = async () => {
-    try {
-      const uid = auth.currentUser?.uid;
+  try {
+    const uid = auth.currentUser?.uid;
 
-      if (!uid) return;
+    if (!uid) return;
 
-      const userSnap = await getDoc(doc(db, "users", uid));
+    const userSnap = await getDoc(doc(db, "users", uid));
 
-      if (!userSnap.exists()) return;
+    if (!userSnap.exists()) return;
 
-      const user: any = userSnap.data();
+    const user: any = userSnap.data();
 
-      const attendance = await getAttendanceRecords();
+    const attendance = await getAttendanceRecords();
 
-      const filtered = attendance.filter(
-        (item) => item.studentId === user.studentId
-      );
+    const filtered = attendance.filter(
+      (item) => item.studentId === user.studentId
+    );
 
-      setStudentAttendance(filtered);
+    setStudentAttendance(filtered);
 
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  } catch (error) {
+    console.log(error);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const totalDays = studentAttendance.length;
 
