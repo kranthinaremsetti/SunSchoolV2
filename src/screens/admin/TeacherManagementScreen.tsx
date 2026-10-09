@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useCallback } from "react";
 import {
   SafeAreaView,
   View,
@@ -20,6 +20,7 @@ import {
   deleteTeacher,
   updateTeacher,
 } from "../../services/teacherService";
+import { useFocusEffect } from "@react-navigation/native";
 export default function TeacherManagementScreen() {
   const [teachers, setTeachers] = useState<any[]>([]);
   const [search, setSearch] = useState("");
@@ -32,9 +33,13 @@ const [subject, setSubject] = useState("");
 const [qualification, setQualification] = useState("");
 
 const [experience, setExperience] = useState("");
-  useEffect(() => {
+
+
+  useFocusEffect(
+  useCallback(() => {
     loadTeachers();
-  }, []);
+  }, [])
+);
 
   const loadTeachers = async () => {
     try {
@@ -59,24 +64,36 @@ const [experience, setExperience] = useState("");
 async function updateCurrentTeacher() {
   if (!editingTeacher) return;
 
-  await updateTeacher(
-    editingTeacher.id,
-    {
-      teacherName,
-      subject,
-      qualification,
-      experience,
-    }
-  );
+  if (
+    !teacherName.trim() ||
+    !subject.trim() ||
+    !qualification.trim() ||
+    !experience.trim()
+  ) {
+    Alert.alert("Validation", "Please fill all teacher details.");
+    return;
+  }
 
-  Alert.alert(
-    "Success",
-    "Teacher Updated"
-  );
+  try {
+    await updateTeacher(editingTeacher.id, {
+      teacherName: teacherName.trim(),
+      subject: subject.trim(),
+      qualification: qualification.trim(),
+      experience: experience.trim(),
+    });
 
-  setEditingTeacher(null);
+    Alert.alert("Success", "Teacher updated successfully.");
 
-  loadTeachers();
+    setEditingTeacher(null);
+    await loadTeachers();
+  } catch (error) {
+    console.error("Failed to update teacher:", error);
+
+    Alert.alert(
+      "Error",
+      "Unable to update teacher. Please try again."
+    );
+  }
 }
   const handleDeleteTeacher = (id: string) => {
     Alert.alert(
@@ -91,9 +108,20 @@ async function updateCurrentTeacher() {
           text: "Delete",
           style: "destructive",
           onPress: async () => {
-            await deleteTeacher(id);
-            loadTeachers();
-          },
+  try {
+    await deleteTeacher(id);
+    await loadTeachers();
+
+    Alert.alert("Success", "Teacher deleted successfully.");
+  } catch (error) {
+    console.error("Failed to delete teacher:", error);
+
+    Alert.alert(
+      "Error",
+      "Unable to delete teacher. Please try again."
+    );
+  }
+},
         },
       ]
     );

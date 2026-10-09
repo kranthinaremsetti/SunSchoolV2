@@ -5,66 +5,121 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  SafeAreaView,
   KeyboardAvoidingView,
   Platform,
   Image,
+  Alert,
 } from "react-native";
-import { Alert } from "react-native";
+
+import { SafeAreaView } from "react-native-safe-area-context";
+import { sendPasswordResetEmail } from "firebase/auth";
+
+import { auth } from "../../firebase/firebaseConfig";
 import { loginUser } from "../../services/authService";
 import { useNavigation } from "@react-navigation/native";
+
 const schoolLogo = require("../../assets/images/school_logo_cropped.png");
+
 export default function LoginScreen() {
   const navigation = useNavigation<any>();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-const handleLogin = async () => {
-  try {
-    const user = await loginUser(email, password);
+  const [loading, setLoading] = useState(false);
 
-    if (!user) {
-      Alert.alert("Login Failed", "User not found.");
-      return;
-    }
-
-    if (user.status === "pending") {
+  const handleLogin = async () => {
+    if (!email.trim() || !password) {
       Alert.alert(
-        "Pending Approval",
-        "Your account is waiting for admin approval."
+        "Missing Details",
+        "Please enter your email and password."
       );
       return;
     }
 
-    if (user.status === "rejected") {
+    try {
+      setLoading(true);
+
+      const user = await loginUser(email, password);
+
+      if (!user) {
+        Alert.alert("Login Failed", "User not found.");
+        return;
+      }
+
+      if (user.status === "pending") {
+        Alert.alert(
+          "Pending Approval",
+          "Your account is waiting for admin approval."
+        );
+        return;
+      }
+
+      if (user.status === "rejected") {
+        Alert.alert(
+          "Registration Rejected",
+          "Your registration was rejected. Please contact the school."
+        );
+        return;
+      }
+
+      switch (user.role) {
+        case "admin":
+          navigation.replace("AdminDashboard");
+          break;
+
+        case "teacher":
+          navigation.replace("TeacherDashboard");
+          break;
+
+        case "parent":
+          navigation.replace("ParentDashboard");
+          break;
+
+        default:
+          Alert.alert(
+            "Login Error",
+            "Your account has an invalid role. Please contact the school."
+          );
+      }
+    } catch (error: any) {
+      console.log("Login Error:", error);
+
       Alert.alert(
-        "Rejected",
-        "Your registration was rejected. Please contact the school."
+        "Login Failed",
+        error?.message || "Unable to login. Please try again."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    const trimmedEmail = email.trim();
+
+    if (!trimmedEmail) {
+      Alert.alert(
+        "Enter Email",
+        "Please enter your registered email address first."
       );
       return;
     }
 
-    switch (user.role) {
-      case "admin":
-        navigation.replace("AdminDashboard");
-        break;
+    try {
+      await sendPasswordResetEmail(auth, trimmedEmail);
 
-      case "teacher":
-        navigation.replace("TeacherDashboard");
-        break;
+      Alert.alert(
+        "Password Reset",
+        "A password reset link has been sent to your email."
+      );
+    } catch (error: any) {
+      console.log("Password Reset Error:", error);
 
-      case "parent":
-        navigation.replace("ParentDashboard");
-        break;
-
-      default:
-        Alert.alert("Error", "Unknown user role.");
+      Alert.alert(
+        "Reset Failed",
+        error?.message || "Unable to send password reset email."
+      );
     }
-
-  } catch (error: any) {
-    Alert.alert("Login Failed", error.message);
-  }
-};
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -73,22 +128,27 @@ const handleLogin = async () => {
         style={styles.wrapper}
       >
         <View style={styles.logoContainer}>
-          <Image
-            source={schoolLogo}
-            style={styles.logo}
-          />
-          <Text style={styles.schoolName}>Sun School</Text>
+          <Image source={schoolLogo} style={styles.logo} />
+
+          <Text style={styles.schoolName}>
+            Sun School
+          </Text>
+
           <Text style={styles.subtitle}>
             School Management System
           </Text>
         </View>
 
         <View style={styles.card}>
-          <Text style={styles.heading}>Welcome Back 👋</Text>
+          <Text style={styles.heading}>
+            Welcome Back 👋
+          </Text>
 
           <TextInput
             placeholder="Email"
             keyboardType="email-address"
+            autoCapitalize="none"
+            autoCorrect={false}
             value={email}
             onChangeText={setEmail}
             style={styles.input}
@@ -102,23 +162,31 @@ const handleLogin = async () => {
             style={styles.input}
           />
 
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={handleForgotPassword}
+            disabled={loading}
+          >
             <Text style={styles.forgot}>
               Forgot Password?
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.loginButton}
+            style={[
+              styles.loginButton,
+              loading && styles.disabledButton,
+            ]}
             onPress={handleLogin}
+            disabled={loading}
           >
-            <Text style={styles.loginText}>LOGIN</Text>
+            <Text style={styles.loginText}>
+              {loading ? "LOGGING IN..." : "LOGIN"}
+            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() =>
-              navigation.navigate("Register")
-            }
+            onPress={() => navigation.navigate("Register")}
+            disabled={loading}
           >
             <Text style={styles.register}>
               New User? Register
@@ -153,7 +221,7 @@ const styles = StyleSheet.create({
     width: 180,
     height: 180,
     resizeMode: "contain",
-},
+  },
 
   schoolName: {
     fontSize: 32,
@@ -203,6 +271,10 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     alignItems: "center",
+  },
+
+  disabledButton: {
+    opacity: 0.6,
   },
 
   loginText: {

@@ -1,8 +1,5 @@
-import React, {
-  useEffect,
-  useState,
-} from "react";
-
+import React, { useCallback, useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import {
   SafeAreaView,
   View,
@@ -23,13 +20,23 @@ export default function PendingRegistrationsScreen() {
   const [users, setUsers] = useState<any[]>([]);
   const [filterRole, setFilterRole] = useState("All");
   const loadUsers = async () => {
+  try {
     const data = await getPendingUsers();
     setUsers(data);
-  };
+  } catch (error) {
+    console.error("Failed to load pending registrations:", error);
+    Alert.alert(
+      "Error",
+      "Unable to load pending registrations. Please try again."
+    );
+  }
+};
 
-  useEffect(() => {
+  useFocusEffect(
+  useCallback(() => {
     loadUsers();
-  }, []);
+  }, [])
+);
 
   const handleApprove = async (uid: string) => {
   try {
@@ -60,46 +67,54 @@ export default function PendingRegistrationsScreen() {
     }
   };
 
-  const renderItem = ({ item }: any) => (
-    <View style={styles.card}>
-      <Text style={styles.email}>
-        {item.email}
-      </Text>
+const renderItem = ({ item }: any) => (
+  <View style={styles.card}>
+    <Text style={styles.email}>{item.email}</Text>
+    <Text>{item.mobile}</Text>
+    <Text style={styles.role}>Role: {item.role}</Text>
 
-      <Text>
-        {item.mobile}
-      </Text>
-      <Text style={styles.role}>
-        Role : {item.role}
-      </Text>
-      <View style={styles.row}>
+    <View style={styles.row}>
+      <TouchableOpacity
+        style={styles.approve}
+        onPress={() =>
+          Alert.alert(
+            "Approve Registration",
+            `Approve this ${item.role} account?`,
+            [
+              { text: "Cancel", style: "cancel" },
+              {
+                text: "Approve",
+                onPress: () => handleApprove(item.id),
+              },
+            ]
+          )
+        }
+      >
+        <Text style={styles.btnText}>Approve</Text>
+      </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.approve}
-          onPress={() =>
-            handleApprove(item.id)
-          }
-        >
-          <Text style={styles.btnText}>
-            Approve
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.reject}
-          onPress={() =>
-            handleReject(item.id)
-          }
-        >
-          <Text style={styles.btnText}>
-            Reject
-          </Text>
-        </TouchableOpacity>
-
-      </View>
+      <TouchableOpacity
+        style={styles.reject}
+        onPress={() =>
+          Alert.alert(
+            "Reject Registration",
+            `Reject this ${item.role} account?`,
+            [
+              { text: "Cancel", style: "cancel" },
+              {
+                text: "Reject",
+                style: "destructive",
+                onPress: () => handleReject(item.id),
+              },
+            ]
+          )
+        }
+      >
+        <Text style={styles.btnText}>Reject</Text>
+      </TouchableOpacity>
     </View>
-  );
-
+  </View>
+);
   const filteredUsers = users.filter((user) => {
   if (filterRole === "All") return true;
 

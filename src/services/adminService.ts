@@ -51,17 +51,17 @@ export async function approveUser(uid: string) {
 
     const parent: any = parentDoc.data();
 
-    const studentRef = await addDoc(
-  collection(db, "students"),
-  {
-    studentName: parent.studentName,
-    rollNo: parent.rollNo,
-    className: parent.className,
-    section: parent.section,
-    dob: parent.dob,
-    parentId: uid,
-  }
-);
+  const studentRef = await addDoc(collection(db, "students"), {
+  name: parent.studentName || "",
+  rollNo: parent.rollNo || "",
+  className: parent.className || parent.class || "",
+  section: parent.section || "",
+  dob: parent.dob || "",
+  parentId: uid,
+  parentName: parent.fatherName || "",
+  mobile: user.mobile || "",
+  createdAt: new Date(),
+});
 
 await updateDoc(
   doc(db, "users", uid),
@@ -98,23 +98,16 @@ return;
 }
 
 
-
 export async function rejectUser(uid: string) {
-  const userDoc = await getDoc(doc(db, "users", uid));
+  const userRef = doc(db, "users", uid);
+
+  const userDoc = await getDoc(userRef);
 
   if (!userDoc.exists()) {
     throw new Error("User not found");
   }
 
-  const user: any = userDoc.data();
-
-  if (user.role === "parent") {
-    await deleteDoc(doc(db, "parents", uid));
-  }
-
-  if (user.role === "teacher") {
-    await deleteDoc(doc(db, "teachers", uid));
-  }
-
-  await deleteDoc(doc(db, "users", uid));
+  await updateDoc(userRef, {
+    status: "rejected",
+  });
 }

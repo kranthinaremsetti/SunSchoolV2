@@ -25,51 +25,61 @@ export default function ParentDashboard() {
     loadStudent();
   }, []);
 
-  const loadStudent = async () => {
+const loadStudent = async () => {
+  try {
+    const uid = auth.currentUser?.uid;
+
+    if (!uid) {
+      setLoading(false);
+      return;
+    }
+
+    const userSnap = await getDoc(doc(db, "users", uid));
+
+    if (!userSnap.exists()) {
+      console.log("User document not found");
+      setLoading(false);
+      return;
+    }
+
+    const user: any = userSnap.data();
+
+    console.log("Parent UID:", uid);
+    console.log("Student ID:", user.studentId);
+
+    if (!user.studentId) {
+      console.log("No student linked to this parent");
+      setStudent(null);
+      setLoading(false);
+      return;
+    }
+
+    const studentSnap = await getDoc(
+      doc(db, "students", user.studentId)
+    );
+
+    if (!studentSnap.exists()) {
+      console.log("Student document not found:", user.studentId);
+      setStudent(null);
+      setLoading(false);
+      return;
+    }
+
+    const studentData: any = {
+      id: studentSnap.id,
+      ...studentSnap.data(),
+    };
+
+    console.log("Student:", studentData);
+
+    setStudent(studentData);
+
+    // Attendance
     try {
-      const uid = auth.currentUser?.uid;
-
-      if (!uid) {
-        setLoading(false);
-        return;
-      }
-
-      const userSnap = await getDoc(doc(db, "users", uid));
-
-      if (!userSnap.exists()) {
-        setLoading(false);
-        return;
-      }
-
-      const user: any = userSnap.data();
-      
-    console.log("UID:", uid);
-
-console.log("User:", user);
-
-console.log("Student ID:", user.studentId);
-      const studentSnap = await getDoc(
-        doc(db, "students", user.studentId)
-      );
-      console.log("Student Exists:", studentSnap.exists());
-
-      if (studentSnap.exists()) {
-        console.log(studentSnap.data());
-      }
-     if (studentSnap.exists()) {
-
-      const studentData = {
-        id: studentSnap.id,
-        ...studentSnap.data(),
-      };
-
-      setStudent(studentData);
-
-      const attendance =
-        await getStudentAttendance(studentData.id);
+      const attendance = await getStudentAttendance(studentData.id);
 
       const present = attendance.filter(
-        (a) => a.status === "Present"
+        (a: any) => a.status === "Present"
       ).length;
 
       const percentage =
@@ -80,29 +90,49 @@ console.log("Student ID:", user.studentId);
             );
 
       setAttendancePercentage(percentage);
+    } catch (error) {
+      console.log("Attendance error:", error);
+      setAttendancePercentage(0);
+    }
+
+    // Fees
+    try {
       const fees = await getStudentFees(studentData.id);
 
-        if (fees.length > 0) {
-          const pending = fees.reduce(
-            (sum: number, fee: any) =>
-              sum + (fee.dueAmount - fee.paidAmount),
-            0
-          );
+      const pending = fees.reduce(
+        (sum: number, fee: any) =>
+          sum +
+          Math.max(
+            0,
+            Number(fee.dueAmount || 0) -
+              Number(fee.paidAmount || 0)
+          ),
+        0
+      );
 
-          setPendingFee(pending);
-        }
-        const notifications =
+      setPendingFee(pending);
+    } catch (error) {
+      console.log("Fee error:", error);
+      setPendingFee(0);
+    }
+
+    // Notifications
+    try {
+      const notifications =
         await getStudentNotifications(studentData.id);
 
       setNotificationCount(notifications.length);
+    } catch (error) {
+      console.log("Notification error:", error);
+      setNotificationCount(0);
     }
 
-    } catch (e) {
-      console.log(e);
-    } finally {
-      setLoading(false);
-    }
-  };
+  } catch (error) {
+    console.log("Dashboard error:", error);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleLogout = async () => {
     await signOut(auth);

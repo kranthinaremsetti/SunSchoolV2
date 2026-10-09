@@ -13,11 +13,12 @@ import {
 import AppInput from "../../components/AppInput";
 import AppButton from "../../components/AppButton";
 import { Picker } from "@react-native-picker/picker";
-
+import { useFocusEffect } from "@react-navigation/native";
 import { classesData } from "../../constants/classesData";
 
 import {
   getStudents,
+  addStudent,
   deleteStudent,
   updateStudent,
 } from "../../services/studentService";
@@ -47,14 +48,31 @@ export default function StudentManagementScreen() {
   const [section, setSection] =
     useState("");
 
-  useEffect(() => {
+  const [showAddModal, setShowAddModal] = useState(false);
+const [newStudentName, setNewStudentName] = useState("");
+const [newRollNo, setNewRollNo] = useState("");
+const [newClassName, setNewClassName] = useState("");
+const [newSection, setNewSection] = useState("");
+
+  useFocusEffect(
+  React.useCallback(() => {
     loadStudents();
-  }, []);
+  }, [])
+);
 
   async function loadStudents() {
+  try {
     const data = await getStudents();
     setStudents(data);
+  } catch (error) {
+    console.error("Failed to load students:", error);
+
+    Alert.alert(
+      "Error",
+      "Unable to load students. Please check your internet connection and try again."
+    );
   }
+}
 
   async function removeStudent(id: string) {
 
@@ -70,12 +88,20 @@ export default function StudentManagementScreen() {
           text: "Delete",
           style: "destructive",
           onPress: async () => {
+  try {
+    await deleteStudent(id);
+    await loadStudents();
 
-            await deleteStudent(id);
+    Alert.alert("Success", "Student deleted successfully.");
+  } catch (error) {
+    console.error("Failed to delete student:", error);
 
-            loadStudents();
-
-          },
+    Alert.alert(
+      "Error",
+      "Unable to delete student. Please try again."
+    );
+  }
+},
         },
       ]
     );
@@ -85,7 +111,7 @@ export default function StudentManagementScreen() {
 
     setEditingStudent(item);
 
-    setStudentName(item.studentName);
+    setStudentName(item.name || item.studentName || "");
 
     setRollNo(item.rollNo);
 
@@ -94,29 +120,69 @@ export default function StudentManagementScreen() {
     setSection(item.section);
   }
 
-  async function updateCurrentStudent() {
+async function updateCurrentStudent() {
+  if (!editingStudent) return;
 
-    if (!editingStudent) return;
+  if (!studentName.trim() || !rollNo.trim() || !className || !section) {
+    Alert.alert("Validation", "Please fill all student details.");
+    return;
+  }
 
-    await updateStudent(
-      editingStudent.id,
-      {
-        studentName,
-        rollNo,
-        className,
-        section,
-      }
-    );
+  try {
+    await updateStudent(editingStudent.id, {
+      name: studentName.trim(),
+      rollNo: rollNo.trim(),
+      className,
+      section,
+    });
 
-    Alert.alert(
-      "Success",
-      "Student Updated"
-    );
+    Alert.alert("Success", "Student updated successfully.");
 
     setEditingStudent(null);
+    await loadStudents();
+  } catch (error) {
+    console.error("Failed to update student:", error);
 
-    loadStudents();
+    Alert.alert(
+      "Error",
+      "Unable to update student. Please try again."
+    );
   }
+}
+
+async function handleAddStudent() {
+  if (
+    !newStudentName.trim() ||
+    !newRollNo.trim() ||
+    !newClassName ||
+    !newSection
+  ) {
+    Alert.alert("Validation", "Please fill all student details.");
+    return;
+  }
+
+  try {
+    await addStudent({
+      name: newStudentName,
+      rollNo: newRollNo,
+      className: newClassName,
+      section: newSection,
+    });
+
+    Alert.alert("Success", "Student added successfully.");
+
+    setNewStudentName("");
+    setNewRollNo("");
+    setNewClassName("");
+    setNewSection("");
+    setShowAddModal(false);
+
+    await loadStudents();
+  } catch (error) {
+    console.error("Failed to add student:", error);
+    Alert.alert("Error", "Unable to add student. Please try again.");
+  }
+}
 
   const filteredStudents =
     students.filter((student) => {
@@ -159,6 +225,13 @@ export default function StudentManagementScreen() {
             <Text style={styles.title}>
               Student Management
             </Text>
+
+            <TouchableOpacity
+  style={styles.addButton}
+  onPress={() => setShowAddModal(true)}
+>
+  <Text style={styles.buttonText}>＋ Add Student</Text>
+</TouchableOpacity>
 
             <AppInput
               placeholder="Search Student"
@@ -241,7 +314,7 @@ export default function StudentManagementScreen() {
           <View style={styles.card}>
 
             <Text style={styles.name}>
-  {item.studentName || item.name}
+  {item.name || item.studentName || "Unnamed Student"}
 </Text>
 
             <Text>
@@ -291,6 +364,76 @@ export default function StudentManagementScreen() {
         )}
 
       />
+
+      <Modal
+  visible={showAddModal}
+  animationType="slide"
+  transparent
+  onRequestClose={() => setShowAddModal(false)}
+>
+  <View style={styles.modalBackground}>
+    <View style={styles.modalCard}>
+      <Text style={styles.modalTitle}>Add Student</Text>
+
+      <AppInput
+        placeholder="Student Name"
+        value={newStudentName}
+        onChangeText={setNewStudentName}
+      />
+
+      <AppInput
+        placeholder="Roll No"
+        value={newRollNo}
+        onChangeText={setNewRollNo}
+      />
+
+      <Text style={styles.label}>Class</Text>
+
+      <View style={styles.pickerContainer}>
+        <Picker
+          selectedValue={newClassName}
+          onValueChange={setNewClassName}
+        >
+          <Picker.Item label="Select Class" value="" />
+
+          {classesData.map((cls) => (
+            <Picker.Item
+              key={cls}
+              label={cls}
+              value={cls}
+            />
+          ))}
+        </Picker>
+      </View>
+
+      <Text style={styles.label}>Section</Text>
+
+      <View style={styles.pickerContainer}>
+        <Picker
+          selectedValue={newSection}
+          onValueChange={setNewSection}
+        >
+          <Picker.Item label="Select Section" value="" />
+          <Picker.Item label="A" value="A" />
+          <Picker.Item label="B" value="B" />
+          <Picker.Item label="C" value="C" />
+          <Picker.Item label="D" value="D" />
+        </Picker>
+      </View>
+
+      <AppButton
+        title="Add Student"
+        onPress={handleAddStudent}
+      />
+
+      <TouchableOpacity
+        onPress={() => setShowAddModal(false)}
+      >
+        <Text style={styles.cancel}>Cancel</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+</Modal>
 
       <Modal
         visible={editingStudent !== null}
@@ -483,4 +626,11 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 16,
   },
+  addButton: {
+  backgroundColor: "#16A34A",
+  padding: 14,
+  borderRadius: 10,
+  alignItems: "center",
+  marginBottom: 15,
+},
 });

@@ -1,6 +1,7 @@
 import {
   collection,
   getDocs,
+  addDoc,
   deleteDoc,
   doc,
   updateDoc,
@@ -80,4 +81,25 @@ export async function updateStudent(
   data: any
 ) {
   await updateDoc(doc(db, "students", id), data);
+}
+
+export async function addStudent(data: {
+  name: string;
+  rollNo: string;
+  className: string;
+  section: string;
+  dob?: string;
+  parentId?: string;
+}) {
+  const studentRef = await addDoc(collection(db, "students"), {
+    name: data.name.trim(),
+    rollNo: data.rollNo.trim(),
+    className: data.className.trim(),
+    section: data.section.trim(),
+    dob: data.dob || "",
+    parentId: data.parentId || "",
+    createdAt: new Date(),
+  });
+
+  return studentRef.id;
 }

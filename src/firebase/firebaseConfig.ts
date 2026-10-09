@@ -5,7 +5,6 @@ import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: "AIzaSyArdKP4rYApEnxnjjf35e5z5Tzn7Z3zTks",
-  
   projectId: "sun-school-v2",
   storageBucket: "sun-school-v2.firebasestorage.app",
   messagingSenderId: "429205969920",
