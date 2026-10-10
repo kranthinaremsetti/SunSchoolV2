@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import {
-  SafeAreaView,
   ScrollView,
   View,
   Text,
   StyleSheet,
+  RefreshControl,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Picker } from "@react-native-picker/picker";
 
 import { classesData } from "../../constants/classesData";
@@ -70,12 +71,30 @@ export default function AdminResultsScreen() {
             0
           ) / results.length
         ).toFixed(1);
+  const [refreshing, setRefreshing] = useState(false);
+
+const handleRefresh = async () => {
+  setRefreshing(true);
+  try {
+    await loadResults();
+  } finally {
+    setRefreshing(false);
+  }
+};
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 30 }}
+        refreshControl={
+    <RefreshControl
+      refreshing={refreshing}
+      onRefresh={handleRefresh}
+      colors={["#2563EB"]}
+      tintColor="#2563EB"
+    />
+  }
       >
         <Text style={styles.title}>Results Report</Text>
 

@@ -6,9 +6,10 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
-  SafeAreaView,
+  ScrollView,
+  RefreshControl,
 } from "react-native";
-
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Picker } from "@react-native-picker/picker";
 import { classesData } from "../../constants/classesData";
 import { getStudents } from "../../services/studentService";
@@ -68,8 +69,13 @@ export default function FeeManagementScreen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-    <View style={styles.container}>
+  <SafeAreaView style={{ flex: 1 }} edges={["top", "left", "right"]}>
+    <ScrollView
+      style={{ flex: 1, backgroundColor: "#F5F7FA" }}
+      contentContainerStyle={{ flexGrow: 1 }}
+      keyboardShouldPersistTaps="handled"
+    >
+      <View style={styles.container}>
 
       <Text style={styles.heading}>
         Fee Management
@@ -201,9 +207,10 @@ export default function FeeManagementScreen() {
         </Text>
       </TouchableOpacity>
 
-    </View>
-    </SafeAreaView>
-  );
+          </View>
+    </ScrollView>
+  </SafeAreaView>
+);
 }
 
 const styles = StyleSheet.create({

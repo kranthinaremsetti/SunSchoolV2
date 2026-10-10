@@ -1,3 +1,4 @@
+
 import React from "react";
 import {
   TouchableOpacity,
@@ -5,6 +6,8 @@ import {
   StyleSheet,
   View,
 } from "react-native";
+import { Colors } from "../theme/colors";
+import { Fonts } from "../theme/fonts";
 
 interface Props {
   title: string;
@@ -21,16 +24,18 @@ export default function DashboardCard({
     <TouchableOpacity
       style={styles.card}
       onPress={onPress}
+      disabled={!onPress}
+      activeOpacity={0.8}
+      accessibilityRole={onPress ? "button" : undefined}
+      accessibilityLabel={title}
     >
-      <Text style={styles.title}>
+      <Text style={styles.title} numberOfLines={2}>
         {title}
       </Text>
 
       {count !== undefined && (
         <View style={styles.badge}>
-          <Text style={styles.count}>
-            {count}
-          </Text>
+          <Text style={styles.count}>{count}</Text>
         </View>
       )}
     </TouchableOpacity>
@@ -39,32 +44,38 @@ export default function DashboardCard({
 
 const styles = StyleSheet.create({
   card: {
-    width: "45%",
-    height: 120,
-    backgroundColor: "#fff",
-    borderRadius: 15,
+    flex: 1,
+    minWidth: 140,
+    minHeight: 120,
+    backgroundColor: Colors.white,
+    borderRadius: 16,
+    padding: 16,
     marginBottom: 15,
     justifyContent: "center",
     alignItems: "center",
-    elevation: 4,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    elevation: 2,
   },
-
   title: {
-    fontSize: 17,
-    fontWeight: "bold",
+    color: Colors.secondary,
+    fontFamily: Fonts.bold,
+    fontSize: 16,
+    fontWeight: "700",
     textAlign: "center",
   },
-
   badge: {
     marginTop: 10,
-    backgroundColor: "#1565C0",
+    backgroundColor: Colors.primary,
     borderRadius: 20,
+    minWidth: 32,
     paddingHorizontal: 12,
     paddingVertical: 5,
+    alignItems: "center",
   },
-
   count: {
-    color: "#fff",
-    fontWeight: "bold",
+    color: Colors.white,
+    fontFamily: Fonts.bold,
+    fontWeight: "700",
   },
 });

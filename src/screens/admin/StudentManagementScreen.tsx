@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
-  SafeAreaView,
+  RefreshControl,
   FlatList,
   View,
   Text,
@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   Modal,
 } from "react-native";
-
+import { SafeAreaView } from "react-native-safe-area-context";
 import AppInput from "../../components/AppInput";
 import AppButton from "../../components/AppButton";
 import { Picker } from "@react-native-picker/picker";

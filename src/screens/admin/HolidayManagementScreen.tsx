@@ -7,9 +7,10 @@ import {
   FlatList,
   StyleSheet,
   Alert,
-  SafeAreaView,
+  RefreshControl,
+  ScrollView,
 } from "react-native";
-
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
   collection,
   addDoc,
@@ -79,11 +80,29 @@ export default function HolidayManagementScreen() {
 
     loadHolidays();
   };
+  const [refreshing, setRefreshing] = useState(false);
 
+const handleRefresh = async () => {
+  setRefreshing(true);
+  try {
+    await loadHolidays();
+  } catch (error) {
+    Alert.alert("Error", "Could not refresh holidays.");
+  } finally {
+    setRefreshing(false);
+  }
+};
   return (
     <SafeAreaView style={{ flex: 1 }}>
-    <View style={styles.container}>
-
+    <ScrollView style={styles.container}>
+      refreshControl={
+  <RefreshControl
+    refreshing={refreshing}
+    onRefresh={handleRefresh}
+    colors={["#2563EB"]}
+    tintColor="#2563EB"
+  />
+}
       <Text style={styles.heading}>
         Holiday Management
       </Text>
@@ -110,8 +129,16 @@ export default function HolidayManagementScreen() {
           Add Holiday
         </Text>
       </TouchableOpacity>
-
+      
       <FlatList
+        refreshControl={
+  <RefreshControl
+    refreshing={refreshing}
+    onRefresh={handleRefresh}
+    colors={["#2563EB"]}
+    tintColor="#2563EB"
+  />
+}
         data={holidays}
         keyExtractor={(item) =>
           item.firestoreId
@@ -144,7 +171,7 @@ export default function HolidayManagementScreen() {
         )}
       />
 
-    </View>
+    </ScrollView>
     </SafeAreaView>
   );
 }

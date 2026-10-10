@@ -6,9 +6,10 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
-  SafeAreaView,
+  RefreshControl,
 } from "react-native";
 import { Linking } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
   getLeaveRequests,
   updateLeaveStatus,
@@ -38,9 +39,29 @@ export default function LeaveRequestsScreen() {
     loadRequests();
   };
 
+  const [refreshing, setRefreshing] = useState(false);
+
+const handleRefresh = async () => {
+  setRefreshing(true);
+  try {
+    await loadRequests();
+  } catch (error) {
+    Alert.alert("Error", "Could not refresh leave requests.");
+  } finally {
+    setRefreshing(false);
+  }
+};
   return (
     <SafeAreaView style={{ flex: 1 }}>
     <FlatList
+      refreshControl={
+  <RefreshControl
+    refreshing={refreshing}
+    onRefresh={handleRefresh}
+    colors={["#2563EB"]}
+    tintColor="#2563EB"
+  />
+}
       data={requests}
       keyExtractor={(item) => item.firestoreId}
       contentContainerStyle={{ padding: 15 }}

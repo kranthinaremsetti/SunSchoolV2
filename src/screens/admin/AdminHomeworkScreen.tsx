@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
-  SafeAreaView,
+  RefreshControl,
   ScrollView,
   View,
   Text,
@@ -8,7 +8,7 @@ import {
 } from "react-native";
 
 import { Picker } from "@react-native-picker/picker";
-
+import { SafeAreaView } from "react-native-safe-area-context";
 import { classesData } from "../../constants/classesData";
 import { getHomework } from "../../services/homeworkService";
 
@@ -19,6 +19,17 @@ export default function AdminHomeworkScreen() {
   useEffect(() => {
     loadHomework();
   }, [selectedClass]);
+
+  const [refreshing, setRefreshing] = useState(false);
+
+const handleRefresh = async () => {
+  setRefreshing(true);
+  try {
+    await loadHomework();
+  } finally {
+    setRefreshing(false);
+  }
+};
 
   const loadHomework = async () => {
     try {
@@ -39,6 +50,14 @@ export default function AdminHomeworkScreen() {
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 30 }}
+         refreshControl={
+    <RefreshControl
+      refreshing={refreshing}
+      onRefresh={handleRefresh}
+      colors={["#2563EB"]}
+      tintColor="#2563EB"
+    />
+  }
       >
         <Text style={styles.title}>Homework</Text>
 

@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import {
-  SafeAreaView,
   ScrollView,
   View,
   Text,
   StyleSheet,
+  RefreshControl,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Picker } from "@react-native-picker/picker";
 
 import { classesData } from "../../constants/classesData";
@@ -65,6 +66,17 @@ export default function AdminAttendanceScreen() {
     }
   };
 
+  const [refreshing, setRefreshing] = useState(false);
+
+const handleRefresh = async () => {
+  setRefreshing(true);
+  try {
+    await loadAttendance();
+  } finally {
+    setRefreshing(false);
+  }
+};
+
   const present = attendanceList.filter(
     (s) => s.status === "Present"
   ).length;
@@ -83,6 +95,14 @@ export default function AdminAttendanceScreen() {
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 30 }}
+        refreshControl={
+    <RefreshControl
+      refreshing={refreshing}
+      onRefresh={handleRefresh}
+      colors={["#2563EB"]}
+      tintColor="#2563EB"
+    />
+  }
       >
         <Text style={styles.title}>
           Attendance Report

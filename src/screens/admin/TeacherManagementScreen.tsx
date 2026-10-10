@@ -1,6 +1,6 @@
 import React, { useEffect, useState,useCallback } from "react";
 import {
-  SafeAreaView,
+  RefreshControl,
   View,
   Text,
   FlatList,
@@ -8,7 +8,7 @@ import {
   StyleSheet,
   Alert,
 } from "react-native";
-
+import { SafeAreaView } from "react-native-safe-area-context";
 import AppInput from "../../components/AppInput";
 import {
   Modal,
@@ -33,7 +33,16 @@ const [subject, setSubject] = useState("");
 const [qualification, setQualification] = useState("");
 
 const [experience, setExperience] = useState("");
+const [refreshing, setRefreshing] = useState(false);
 
+const handleRefresh = async () => {
+  setRefreshing(true);
+  try {
+    await loadTeachers();
+  } finally {
+    setRefreshing(false);
+  }
+};
 
   useFocusEffect(
   useCallback(() => {
