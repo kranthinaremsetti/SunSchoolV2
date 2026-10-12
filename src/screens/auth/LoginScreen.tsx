@@ -9,6 +9,7 @@ import {
   Platform,
   Image,
   Alert,
+  ScrollView,
 } from "react-native";
 
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -25,6 +26,7 @@ export default function LoginScreen() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
@@ -124,75 +126,101 @@ export default function LoginScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.wrapper}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 10 : 0}
       >
-        <View style={styles.logoContainer}>
-          <Image source={schoolLogo} style={styles.logo} />
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="none"
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.logoContainer}>
+            <Image source={schoolLogo} style={styles.logo} />
 
-          <Text style={styles.schoolName}>
-            Sun School
-          </Text>
+            <Text style={styles.schoolName}>Sun School</Text>
 
-          <Text style={styles.subtitle}>
-            School Management System
-          </Text>
-        </View>
-
-        <View style={styles.card}>
-          <Text style={styles.heading}>
-            Welcome Back 👋
-          </Text>
-
-          <TextInput
-            placeholder="Email"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            autoCorrect={false}
-            value={email}
-            onChangeText={setEmail}
-            style={styles.input}
-          />
-
-          <TextInput
-            placeholder="Password"
-            secureTextEntry
-            value={password}
-            onChangeText={setPassword}
-            style={styles.input}
-          />
-
-          <TouchableOpacity
-            onPress={handleForgotPassword}
-            disabled={loading}
-          >
-            <Text style={styles.forgot}>
-              Forgot Password?
+            <Text style={styles.subtitle}>
+              School Management System
             </Text>
-          </TouchableOpacity>
+          </View>
 
-          <TouchableOpacity
-            style={[
-              styles.loginButton,
-              loading && styles.disabledButton,
-            ]}
-            onPress={handleLogin}
-            disabled={loading}
-          >
-            <Text style={styles.loginText}>
-              {loading ? "LOGGING IN..." : "LOGIN"}
-            </Text>
-          </TouchableOpacity>
+          <View style={styles.card}>
+            <Text style={styles.heading}>Welcome Back 👋</Text>
 
-          <TouchableOpacity
-            onPress={() => navigation.navigate("Register")}
-            disabled={loading}
-          >
-            <Text style={styles.register}>
-              New User? Register
-            </Text>
-          </TouchableOpacity>
-        </View>
+            <TextInput
+              placeholder="Email"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
+              value={email}
+              onChangeText={setEmail}
+              style={styles.input}
+              editable={!loading}
+              returnKeyType="next"
+            />
+
+            {/* Password input with show/hide toggle */}
+            <View style={styles.passwordContainer}>
+              <TextInput
+                placeholder="Password"
+                secureTextEntry={!showPassword}
+                value={password}
+                onChangeText={setPassword}
+                style={styles.passwordInput}
+                editable={!loading}
+                autoCapitalize="none"
+                autoCorrect={false}
+                returnKeyType="done"
+                onSubmitEditing={handleLogin}
+              />
+
+              <TouchableOpacity
+                style={styles.eyeButton}
+                onPress={() => setShowPassword((previous) => !previous)}
+                disabled={loading}
+                accessibilityRole="button"
+                accessibilityLabel={
+                  showPassword ? "Hide password" : "Show password"
+                }
+              >
+                <Text style={styles.eyeIcon}>
+                  {showPassword ? "🙈" : "👁️"}
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity
+              onPress={handleForgotPassword}
+              disabled={loading}
+            >
+              <Text style={styles.forgot}>Forgot Password?</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.loginButton,
+                loading && styles.disabledButton,
+              ]}
+              onPress={handleLogin}
+              disabled={loading}
+            >
+              <Text style={styles.loginText}>
+                {loading ? "LOGGING IN..." : "LOGIN"}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => navigation.navigate("Register")}
+              disabled={loading}
+            >
+              <Text style={styles.register}>
+                New User? Register
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -208,8 +236,13 @@ const styles = StyleSheet.create({
 
   wrapper: {
     flex: 1,
+  },
+
+  scrollContent: {
+    flexGrow: 1,
     justifyContent: "center",
     padding: 22,
+    paddingBottom: 40,
   },
 
   logoContainer: {
@@ -247,6 +280,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 25,
+    color: "#0F172A",
   },
 
   input: {
@@ -258,6 +292,36 @@ const styles = StyleSheet.create({
     marginBottom: 18,
     fontSize: 16,
     backgroundColor: "#FAFAFA",
+    color: "#0F172A",
+  },
+
+  passwordContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#DDD",
+    borderRadius: 12,
+    marginBottom: 18,
+    backgroundColor: "#FAFAFA",
+  },
+
+  passwordInput: {
+    flex: 1,
+    paddingHorizontal: 15,
+    paddingVertical: 15,
+    fontSize: 16,
+    color: "#0F172A",
+  },
+
+  eyeButton: {
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  eyeIcon: {
+    fontSize: 21,
   },
 
   forgot: {

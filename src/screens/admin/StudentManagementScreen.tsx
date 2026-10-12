@@ -53,7 +53,16 @@ const [newStudentName, setNewStudentName] = useState("");
 const [newRollNo, setNewRollNo] = useState("");
 const [newClassName, setNewClassName] = useState("");
 const [newSection, setNewSection] = useState("");
+const [refreshing, setRefreshing] = useState(false);
 
+const handleRefresh = async () => {
+  setRefreshing(true);
+  try {
+    await loadStudents();
+  } finally {
+    setRefreshing(false);
+  }
+};
   useFocusEffect(
   React.useCallback(() => {
     loadStudents();
@@ -214,6 +223,14 @@ async function handleAddStudent() {
 
       <FlatList
 
+        refreshControl={
+  <RefreshControl
+    refreshing={refreshing}
+    onRefresh={handleRefresh}
+    colors={["#2563EB"]}
+    tintColor="#2563EB"
+  />
+}
         data={filteredStudents}
 
         keyExtractor={(item) => item.id}

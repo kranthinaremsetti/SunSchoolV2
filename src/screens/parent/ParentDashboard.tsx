@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, {useCallback, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
 } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { signOut } from "firebase/auth";
@@ -24,7 +25,44 @@ export default function ParentDashboard() {
   useEffect(() => {
     loadStudent();
   }, []);
+  useFocusEffect(
+  useCallback(() => {
+    let active = true;
 
+    const refreshNotificationCount = async () => {
+      try {
+        const uid = auth.currentUser?.uid;
+        if (!uid) return;
+
+        const userSnap = await getDoc(doc(db, "users", uid));
+        const studentId = userSnap.data()?.studentId;
+
+        if (!studentId) {
+          if (active) setNotificationCount(0);
+          return;
+        }
+
+        const notifications = await getStudentNotifications(
+          String(studentId)
+        );
+
+        if (active) {
+          setNotificationCount(
+            notifications.filter((notification) => !notification.isRead).length
+          );
+        }
+      } catch (error) {
+        console.log("Notification count refresh failed:", error);
+      }
+    };
+
+    void refreshNotificationCount();
+
+    return () => {
+      active = false;
+    };
+  }, [])
+);
 const loadStudent = async () => {
   try {
     const uid = auth.currentUser?.uid;
@@ -121,7 +159,9 @@ const loadStudent = async () => {
       const notifications =
         await getStudentNotifications(studentData.id);
 
-      setNotificationCount(notifications.length);
+      setNotificationCount(
+  notifications.filter((notification) => !notification.isRead).length
+);
     } catch (error) {
       console.log("Notification error:", error);
       setNotificationCount(0);

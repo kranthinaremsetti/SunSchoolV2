@@ -160,7 +160,8 @@ const [attendanceDateValue, setAttendanceDateValue] = useState(new Date());
           await saveNotification(
             student.id,
             "Attendance Alert",
-            `You were absent on ${attendanceDate}.`
+            `You were absent on ${attendanceDate}.`,
+            "Attendance"
           );
         }
       }
