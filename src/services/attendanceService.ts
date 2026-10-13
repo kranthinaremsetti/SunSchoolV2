@@ -47,6 +47,27 @@ export const getStudentAttendance = async (
   })) as AttendanceRecord[];
 };
 
+export const getAttendanceByClass = async (
+  className: string
+): Promise<AttendanceRecord[]> => {
+  if (!className.trim()) {
+    return [];
+  }
+
+  const attendanceQuery = query(
+    collection(db, "attendance"),
+    where("className", "==", className)
+  );
+
+  const snapshot = await getDocs(attendanceQuery);
+
+  return snapshot.docs.map((attendanceDoc) => ({
+    firestoreId: attendanceDoc.id,
+    ...attendanceDoc.data(),
+  })) as AttendanceRecord[];
+};
+
+
 const makeAttendanceId = (
   studentId: string,
   date: string,

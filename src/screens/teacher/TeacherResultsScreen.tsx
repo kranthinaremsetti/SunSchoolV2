@@ -77,9 +77,15 @@ console.log("Selected Student ID:", studentId);
     setMaxMarks("100");
     setRemarks("");
   } catch (error) {
-    console.log(error);
-    Alert.alert("Error", "Failed to save result");
-  }
+  console.error("Result/notification error:", error);
+
+  Alert.alert(
+    "Save Error",
+    error instanceof Error
+      ? error.message
+      : "Failed to save result or notification."
+  );
+}
 };
 
   return (

@@ -9,7 +9,7 @@ import {
   RefreshControl,
 } from "react-native";
 import { signOut } from "firebase/auth";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, onSnapshot } from "firebase/firestore";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
@@ -26,56 +26,74 @@ export default function AdminDashboard() {
     students: 0,
     teachers: 0,
   });
+
   const [refreshing, setRefreshing] = useState(false);
 
-  const loadDashboard = useCallback(async () => {
-    try {
-      const snapshot = await getDocs(collection(db, "users"));
-
-      let pending = 0;
-      let teachers = 0;
-      let parents = 0;
-
-      snapshot.forEach((userDoc) => {
-        const data = userDoc.data();
-
-        if (data.status === "pending") pending++;
-        if (data.role === "teacher" && data.status === "approved") {
-          teachers++;
-        }
-        if (data.role === "parent" && data.status === "approved") {
-          parents++;
-        }
-      });
-
-      setStats({
-        pending,
-        students: parents,
-        teachers,
-      });
-    } catch (error) {
-      console.error("Failed to load admin dashboard:", error);
-    }
-  }, []);
-
+  // Listen for real-time changes while the dashboard is focused.
   useFocusEffect(
     useCallback(() => {
-      loadDashboard();
-    }, [loadDashboard])
+      const unsubscribe = onSnapshot(
+        collection(db, "users"),
+        (snapshot) => {
+          let pending = 0;
+          let teachers = 0;
+          let parents = 0;
+
+          snapshot.forEach((userDoc) => {
+            const data = userDoc.data();
+
+            if (data.status === "pending") {
+              pending++;
+            }
+
+            if (
+              data.role === "teacher" &&
+              data.status === "approved"
+            ) {
+              teachers++;
+            }
+
+            if (
+              data.role === "parent" &&
+              data.status === "approved"
+            ) {
+              parents++;
+            }
+          });
+
+          setStats({
+            pending,
+            students: parents,
+            teachers,
+          });
+        },
+        (error) => {
+          console.error(
+            "Failed to listen to dashboard updates:",
+            error
+          );
+        }
+      );
+
+      // Stop listening when leaving the dashboard.
+      return unsubscribe;
+    }, [])
   );
 
   const handleRefresh = async () => {
     setRefreshing(true);
-    try {
-      await loadDashboard();
-    } finally {
-      setRefreshing(false);
-    }
+
+    // Firestore's listener updates the data automatically.
+    // This brief delay preserves the pull-to-refresh indicator.
+    await new Promise<void>((resolve) => setTimeout(resolve, 500));
+
+    setRefreshing(false);
   };
 
   const handleLogout = async () => {
     try {
       await signOut(auth);
+
       navigation.reset({
         index: 0,
         routes: [{ name: "Login" }],
@@ -86,7 +104,10 @@ export default function AdminDashboard() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
+    <SafeAreaView
+      style={styles.safeArea}
+      edges={["top", "left", "right"]}
+    >
       <ScrollView
         style={styles.container}
         contentContainerStyle={styles.content}
@@ -115,6 +136,7 @@ export default function AdminDashboard() {
             <Text style={styles.school}>Sun School</Text>
             <Text style={styles.welcome}>Welcome, Admin 👋</Text>
           </View>
+
           <Text style={styles.welcomeIcon}>✦</Text>
         </View>
 
@@ -123,7 +145,9 @@ export default function AdminDashboard() {
             <DashboardCard
               title="Pending Registrations"
               count={stats.pending}
-              onPress={() => navigation.navigate("PendingRegistrations")}
+              onPress={() =>
+                navigation.navigate("PendingRegistrations")
+              }
             />
           </View>
 
@@ -131,7 +155,9 @@ export default function AdminDashboard() {
             <DashboardCard
               title="Students"
               count={stats.students}
-              onPress={() => navigation.navigate("StudentManagement")}
+              onPress={() =>
+                navigation.navigate("StudentManagement")
+              }
             />
           </View>
 
@@ -139,61 +165,79 @@ export default function AdminDashboard() {
             <DashboardCard
               title="Teachers"
               count={stats.teachers}
-              onPress={() => navigation.navigate("TeacherManagement")}
+              onPress={() =>
+                navigation.navigate("TeacherManagement")
+              }
             />
           </View>
 
           <View style={styles.cardSlot}>
             <DashboardCard
               title="Attendance"
-              onPress={() => navigation.navigate("AdminAttendance")}
+              onPress={() =>
+                navigation.navigate("AdminAttendance")
+              }
             />
           </View>
 
           <View style={styles.cardSlot}>
             <DashboardCard
               title="Homework"
-              onPress={() => navigation.navigate("AdminHomework")}
+              onPress={() =>
+                navigation.navigate("AdminHomework")
+              }
             />
           </View>
 
           <View style={styles.cardSlot}>
             <DashboardCard
               title="Results"
-              onPress={() => navigation.navigate("AdminResults")}
+              onPress={() =>
+                navigation.navigate("AdminResults")
+              }
             />
           </View>
 
           <View style={styles.cardSlot}>
             <DashboardCard
               title="Fees"
-              onPress={() => navigation.navigate("FeeManagement")}
+              onPress={() =>
+                navigation.navigate("FeeManagement")
+              }
             />
           </View>
 
           <View style={styles.cardSlot}>
             <DashboardCard
               title="Announcements"
-              onPress={() => navigation.navigate("AdminAnnouncements")}
+              onPress={() =>
+                navigation.navigate("AdminAnnouncements")
+              }
             />
           </View>
 
           <View style={styles.cardSlot}>
             <DashboardCard
               title="Leave Requests"
-              onPress={() => navigation.navigate("LeaveRequests")}
+              onPress={() =>
+                navigation.navigate("LeaveRequests")
+              }
             />
           </View>
 
           <View style={styles.cardSlot}>
             <DashboardCard
               title="Holidays"
-              onPress={() => navigation.navigate("HolidayManagement")}
+              onPress={() =>
+                navigation.navigate("HolidayManagement")
+              }
             />
           </View>
         </View>
 
-        <Text style={styles.footer}>Sun School · Admin Portal</Text>
+        <Text style={styles.footer}>
+          Sun School · Admin Portal
+        </Text>
       </ScrollView>
     </SafeAreaView>
   );

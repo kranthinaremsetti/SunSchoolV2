@@ -8,8 +8,7 @@ import {
   doc,
   updateDoc,
 } from "firebase/firestore";
-
-import { db } from "../firebase/firebaseConfig";
+import { auth, db } from "../firebase/firebaseConfig";
 
 export type NotificationCategory =
   | "Attendance"
@@ -38,20 +37,38 @@ export const saveNotification = async (
   message: string,
   category: NotificationCategory = "General"
 ): Promise<void> => {
-  if (!studentId || !title.trim() || !message.trim()) {
-    throw new Error(
-      "Student ID, title, and message are required."
-    );
-  }
-
-  await addDoc(collection(db, "notifications"), {
+  console.log("[Notification] Starting write:", {
     studentId,
     title,
-    message,
     category,
-    isRead: false,
-    createdAt: serverTimestamp(),
+    signedIn: !!auth.currentUser,
   });
+
+  if (!studentId?.trim() || !title.trim() || !message.trim()) {
+    throw new Error("Student ID, title, and message are required.");
+  }
+
+  try {
+    const notificationRef = await addDoc(
+      collection(db, "notifications"),
+      {
+        studentId: studentId.trim(),
+        title: title.trim(),
+        message: message.trim(),
+        category,
+        isRead: false,
+        createdAt: serverTimestamp(),
+      }
+    );
+
+    console.log(
+      "[Notification] Successfully created:",
+      notificationRef.id
+    );
+  } catch (error) {
+    console.error("[Notification] Firestore write failed:", error);
+    throw error;
+  }
 };
 
 // Sort newest notifications first.
