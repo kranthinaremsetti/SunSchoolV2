@@ -9,7 +9,12 @@ import {
   RefreshControl,
 } from "react-native";
 import { signOut } from "firebase/auth";
-import { collection, onSnapshot } from "firebase/firestore";
+import {
+  collection,
+  onSnapshot,
+  query,
+  where,
+} from "firebase/firestore";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
@@ -20,7 +25,7 @@ import { Fonts } from "../../theme/fonts";
 
 export default function AdminDashboard() {
   const navigation = useNavigation<any>();
-
+  const [pendingLeaveRequests, setPendingLeaveRequests] = useState(0);
   const [stats, setStats] = useState({
     pending: 0,
     students: 0,
@@ -79,6 +84,28 @@ export default function AdminDashboard() {
       return unsubscribe;
     }, [])
   );
+
+  useFocusEffect(
+  useCallback(() => {
+    const pendingLeavesQuery = query(
+      collection(db, "leaveRequests"),
+      where("status", "==", "Pending")
+    );
+
+    const unsubscribe = onSnapshot(
+      pendingLeavesQuery,
+      (snapshot) => {
+        setPendingLeaveRequests(snapshot.size);
+      },
+      (error) => {
+        console.error("Failed to listen to leave requests:", error);
+      }
+    );
+
+    return unsubscribe;
+  }, [])
+);
+
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -218,11 +245,10 @@ export default function AdminDashboard() {
 
           <View style={styles.cardSlot}>
             <DashboardCard
-              title="Leave Requests"
-              onPress={() =>
-                navigation.navigate("LeaveRequests")
-              }
-            />
+  title="Leave Requests"
+  count={pendingLeaveRequests}
+  onPress={() => navigation.navigate("LeaveRequests")}
+/>
           </View>
 
           <View style={styles.cardSlot}>

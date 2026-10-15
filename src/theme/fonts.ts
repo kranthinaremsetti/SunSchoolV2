@@ -1,5 +1,5 @@
-export const Fonts = {
-  regular: "System",
-  medium: "System",
-  bold: "System",
-};
+  export const Fonts = {
+    regular: "System",
+    medium: "System",
+    bold: "System",
+  };

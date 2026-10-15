@@ -1,14 +1,16 @@
-
 import {
   addDoc,
   collection,
   getDocs,
+  getDoc,
   doc,
   updateDoc,
   query,
   where,
   serverTimestamp,
 } from "firebase/firestore";
+
+import { saveNotification } from "./notificationService";
 
 import { db } from "../firebase/firebaseConfig";
 
@@ -24,6 +26,7 @@ export interface FeeRecord {
   status: "Pending" | "Partially Paid" | "Paid";
 }
 
+
 export const saveFee = async (
   studentId: string,
   academicYear: string,
@@ -32,18 +35,27 @@ export const saveFee = async (
   paidAmount: number,
   dueDate: string
 ) => {
+  console.log("SAVE FEE FUNCTION IS RUNNING");
   if (!studentId) throw new Error("Please select a student.");
+
   if (!Number.isFinite(totalFee) || totalFee <= 0) {
     throw new Error("Total fee must be greater than zero.");
   }
-  if (!Number.isFinite(paidAmount) || paidAmount < 0 || paidAmount > totalFee) {
+
+  if (
+    !Number.isFinite(paidAmount) ||
+    paidAmount < 0 ||
+    paidAmount > totalFee
+  ) {
     throw new Error("Paid amount must be between zero and the total fee.");
   }
+
   if (!/^\d{4}-\d{2}-\d{2}$/.test(dueDate)) {
     throw new Error("Due date must use YYYY-MM-DD format.");
   }
 
   const dueAmount = Math.max(0, totalFee - paidAmount);
+
   const status =
     dueAmount === 0
       ? "Paid"
@@ -63,6 +75,21 @@ export const saveFee = async (
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   });
+
+  console.log("[Fee] Fee saved:", { studentId, dueAmount, status });
+
+  if (dueAmount > 0) {
+    console.log("[Fee] Sending notification to student:", studentId);
+
+    await saveNotification(
+      studentId,
+      "School Fee Reminder",
+      `${feeType} fee for ${academicYear}: ₹${dueAmount} is outstanding. Due date: ${dueDate}.`,
+      "Fees"
+    );
+
+    console.log("[Fee] Notification saved successfully.");
+  }
 };
 
 export const getFees = async (): Promise<FeeRecord[]> => {
@@ -122,10 +149,25 @@ export const updateFeePayment = async (
       : "Pending";
 
   await updateDoc(doc(db, "fees", feeId), {
-    totalFee,
-    paidAmount,
-    dueAmount,
-    status,
-    updatedAt: serverTimestamp(),
-  });
+  totalFee,
+  paidAmount,
+  dueAmount,
+  status,
+  updatedAt: serverTimestamp(),
+});
+
+if (dueAmount > 0) {
+  const feeSnapshot = await getDoc(doc(db, "fees", feeId));
+
+  if (feeSnapshot.exists()) {
+    const fee = feeSnapshot.data();
+
+    await saveNotification(
+      fee.studentId,
+      "Fee Payment Updated",
+      `${fee.feeType} fee for ${fee.academicYear}: ₹${paidAmount} paid, ₹${dueAmount} remaining. Status: ${status}.`,
+      "Fees"
+    );
+  }
+}
 };

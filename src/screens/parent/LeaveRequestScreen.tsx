@@ -7,7 +7,10 @@ import {
   StyleSheet,
   Alert,
   SafeAreaView,
+  Platform,
 } from "react-native";
+
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 import { auth, db } from "../../firebase/firebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
@@ -19,7 +22,23 @@ export default function LeaveRequestScreen() {
   const [description, setDescription] = useState("");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
+  const [showFromPicker, setShowFromPicker] = useState(false);
+const [showToPicker, setShowToPicker] = useState(false);
 
+const formatDate = (date: Date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+};
+
+const parseDate = (value: string) => {
+  if (!value) return new Date();
+
+  const [year, month, day] = value.split("-").map(Number);
+  return new Date(year, month - 1, day);
+};
   const pickDocument = () => {
     Alert.alert(
       "Coming Soon",
@@ -27,46 +46,61 @@ export default function LeaveRequestScreen() {
     );
   };
 
-  const submitLeave = async () => {
-    try {
-      const uid = auth.currentUser?.uid;
 
-      if (!uid) return;
+const submitLeave = async () => {
+  try {
+    const uid = auth.currentUser?.uid;
 
-      const userSnap = await getDoc(doc(db, "users", uid));
-
-      if (!userSnap.exists()) {
-        Alert.alert("User not found");
-        return;
-      }
-
-      await saveLeaveRequest(
-        uid,
-        "parent",
-        leaveType,
-        description,
-        fromDate,
-        toDate,
-        ""
-      );
-
-      Alert.alert(
-        "Success",
-        "Leave request submitted successfully."
-      );
-
-      setLeaveType("");
-      setDescription("");
-      setFromDate("");
-      setToDate("");
-    } catch (error: any) {
-      console.log(error);
-      Alert.alert(
-        "Error",
-        error.message || "Failed to submit leave request."
-      );
+    if (!uid) {
+      Alert.alert("Login Required", "Please log in again.");
+      return;
     }
-  };
+
+    const userSnap = await getDoc(doc(db, "users", uid));
+
+    if (!userSnap.exists()) {
+      Alert.alert("Error", "User not found.");
+      return;
+    }
+
+    const userData = userSnap.data();
+    const role = String(userData.role || "").toLowerCase();
+
+    if (role !== "parent" && role !== "teacher") {
+      Alert.alert(
+        "Access Denied",
+        "Only parents and teachers can submit leave requests."
+      );
+      return;
+    }
+
+    await saveLeaveRequest(
+      uid,
+      role,
+      leaveType,
+      description,
+      fromDate,
+      toDate,
+      ""
+    );
+
+    Alert.alert(
+      "Success",
+      "Leave request submitted successfully."
+    );
+
+    setLeaveType("");
+    setDescription("");
+    setFromDate("");
+    setToDate("");
+  } catch (error: any) {
+    console.error("[Leave] Submission failed:", error);
+    Alert.alert(
+      "Error",
+      error.message || "Failed to submit leave request."
+    );
+  }
+};
 
   return (
     
@@ -121,19 +155,69 @@ export default function LeaveRequestScreen() {
         textAlignVertical="top"
       />
 
-      <TextInput
-        style={styles.input}
-        placeholder="From Date (YYYY-MM-DD)"
-        value={fromDate}
-        onChangeText={setFromDate}
-      />
+      <TouchableOpacity
+  style={styles.dateButton}
+  onPress={() => setShowFromPicker(true)}
+>
+  <Text style={styles.dateText}>
+    📅 From Date: {fromDate || "Select start date"}
+  </Text>
+</TouchableOpacity>
 
-      <TextInput
-        style={styles.input}
-        placeholder="To Date (YYYY-MM-DD)"
-        value={toDate}
-        onChangeText={setToDate}
-      />
+{showFromPicker && (
+  <DateTimePicker
+    value={parseDate(fromDate)}
+    mode="date"
+    display={Platform.OS === "ios" ? "spinner" : "default"}
+    minimumDate={new Date(2000, 0, 1)}
+    onChange={(event, selectedDate) => {
+      setShowFromPicker(Platform.OS === "ios");
+
+      if (event.type === "dismissed" || !selectedDate) {
+        setShowFromPicker(false);
+        return;
+      }
+
+      const selected = formatDate(selectedDate);
+      setFromDate(selected);
+
+      if (toDate && toDate < selected) {
+        setToDate("");
+      }
+
+      setShowFromPicker(false);
+    }}
+  />
+)}
+
+<TouchableOpacity
+  style={styles.dateButton}
+  onPress={() => setShowToPicker(true)}
+>
+  <Text style={styles.dateText}>
+    📅 To Date: {toDate || "Select end date"}
+  </Text>
+</TouchableOpacity>
+
+{showToPicker && (
+  <DateTimePicker
+    value={parseDate(toDate || fromDate)}
+    mode="date"
+    display={Platform.OS === "ios" ? "spinner" : "default"}
+    minimumDate={fromDate ? parseDate(fromDate) : new Date(2000, 0, 1)}
+    onChange={(event, selectedDate) => {
+      setShowToPicker(Platform.OS === "ios");
+
+      if (event.type === "dismissed" || !selectedDate) {
+        setShowToPicker(false);
+        return;
+      }
+
+      setToDate(formatDate(selectedDate));
+      setShowToPicker(false);
+    }}
+  />
+)}
 
       <TouchableOpacity
         style={styles.uploadButton}
@@ -210,4 +294,18 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
   },
+  dateButton: {
+  backgroundColor: "white",
+  padding: 16,
+  borderRadius: 10,
+  marginBottom: 15,
+  elevation: 2,
+  borderWidth: 1,
+  borderColor: "#E5E7EB",
+},
+
+dateText: {
+  fontSize: 16,
+  color: "#374151",
+},
 });
